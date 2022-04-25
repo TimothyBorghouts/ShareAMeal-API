@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
   });
 });
 
-//Toevoegen van een gebruiker aan de gebruiker database. De gebruiker moet een unieke e-email hebben
+//Toevoegen van een gebruiker aan de gebruiker database.
 app.post("/api/user", (req, res) => {
   let user = req.body;
   userId++;
@@ -30,6 +30,7 @@ app.post("/api/user", (req, res) => {
     userId,
     ...user,
   };
+  //Toevoegen aan de database.
   userDatabase.push(user);
   res.status(201).json({
     status: 201,
@@ -38,7 +39,7 @@ app.post("/api/user", (req, res) => {
 });
 
 //Bekijken van alle gebruikers in de gebruiker database.
-app.get("/api/user", (req, res, next) => {
+app.get("/api/user", (req, res) => {
   res.status(202).json({
     status: 202,
     result: userDatabase,
@@ -55,10 +56,9 @@ app.get("/api/user/profile", (req, res) => {
 });
 
 //Een specifieke gebruiker opvragen uit de gebruiker database.
-app.get("/api/user/:userId", (req, res, next) => {
+app.get("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   let user = database.filter((item) => item.id == userId);
-  console.log(`User met ID ${id} gezocht`);
   if (user.length > 0) {
     res.status(204).json({
       status: 204,
@@ -73,14 +73,26 @@ app.get("/api/user/:userId", (req, res, next) => {
 });
 
 //Verander een specifieke gebruiker uit de gebruiker database.
-app.put("/api/user/:userId", (req, res, next) => {
+app.put("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   let user = database.filter((item) => item.id == userId);
-  console.log(`User met ID ${id} gezocht`);
   if (user.length > 0) {
+    //Verwijderen uit de database.
+    const index = userDatabase.indexOf(user);
+    userDatabase.slice(index, 1);
+
+    //Opnieuw toevoegen aan de database.
+    let user = req.body;
+    userId++;
+    user = {
+      userId,
+      ...user,
+    };
+    userDatabase.push(user);
+
     res.status(205).json({
       status: 205,
-      result: "Gebruiker is gewijzigd in de database",
+      result: "Gebruiker is gewijzigd in de database" + userDatabase,
     });
   } else {
     res.status(401).json({
@@ -91,14 +103,16 @@ app.put("/api/user/:userId", (req, res, next) => {
 });
 
 //Verwijder een gebruiker uit de gebruiker database
-app.delete("/api/user/:userId", (req, res, next) => {
+app.delete("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   let user = database.filter((item) => item.id == userId);
-  console.log(`User met ID ${id} gezocht`);
   if (user.length > 0) {
-    userDatabase.pop();
-    res.status(205).json({
-      status: 205,
+    //Verwijderen uit de database.
+    const index = userDatabase.indexOf(user);
+    userDatabase.slice(index, 1);
+
+    res.status(206).json({
+      status: 206,
       result: "Gebruiker is verwijderd uit de database",
     });
   } else {
