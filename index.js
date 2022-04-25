@@ -58,7 +58,7 @@ app.get("/api/user/profile", (req, res) => {
 //Een specifieke gebruiker opvragen uit de gebruiker database.
 app.get("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
-  let user = database.filter((item) => item.id == userId);
+  let user = userDatabase.filter((item) => item.id == userId);
   if (user.length > 0) {
     res.status(204).json({
       status: 204,
@@ -75,7 +75,7 @@ app.get("/api/user/:userId", (req, res) => {
 //Verander een specifieke gebruiker uit de gebruiker database.
 app.put("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
-  let user = database.filter((item) => item.id == userId);
+  let user = userDatabase.filter((item) => item.id == userId);
   if (user.length > 0) {
     //Verwijderen uit de database.
     const index = userDatabase.indexOf(user);
@@ -105,7 +105,7 @@ app.put("/api/user/:userId", (req, res) => {
 //Verwijder een gebruiker uit de gebruiker database
 app.delete("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
-  let user = database.filter((item) => item.id == userId);
+  let user = userDatabase.filter((item) => item.id == userId);
   if (user.length > 0) {
     //Verwijderen uit de database.
     const index = userDatabase.indexOf(user);
