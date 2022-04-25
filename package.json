@@ -1,13 +1,13 @@
 {
   "name": "programmeren-4-shareameal-server",
   "version": "0.0.1",
-  "description": "Server voor opdracht van programmeren 4",
+  "description": "Programmeren 4 SAM server",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Timothy Borghouts",
+  "author": "Timothy",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^2.0.15"

@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
 let userDatabase = [];
-let userId = 0;
+let id = 0;
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -25,9 +25,9 @@ app.get("/", (req, res) => {
 //Toevoegen van een gebruiker aan de gebruiker database.
 app.post("/api/user", (req, res) => {
   let user = req.body;
-  userId++;
+  id++;
   user = {
-    userId,
+    id,
     ...user,
   };
   //Toevoegen aan de database.
@@ -60,6 +60,7 @@ app.get("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   let user = userDatabase.filter((item) => item.id == userId);
   if (user.length > 0) {
+    console.log(user);
     res.status(204).json({
       status: 204,
       result: user,
@@ -84,7 +85,7 @@ app.put("/api/user/:userId", (req, res) => {
     //Opnieuw toevoegen aan de database.
     let user = req.body;
     user = {
-      userId,
+      id,
       ...user,
     };
     userDatabase.push(user);
@@ -109,7 +110,7 @@ app.delete("/api/user/:userId", (req, res) => {
     //Verwijderen uit de database.
     const index = userDatabase.indexOf(user);
     userDatabase.slice(index, 1);
-    userId--;
+    id--;
 
     res.status(206).json({
       status: 206,
