@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 });
 
 //Toevoegen van een gebruiker aan de gebruiker database. De gebruiker moet een unieke e-email hebben
-app.post("/api/users", (req, res) => {
+app.post("/api/user", (req, res) => {
   let user = req.body;
   userId++;
   user = {
@@ -38,7 +38,7 @@ app.post("/api/users", (req, res) => {
 });
 
 //Bekijken van alle gebruikers in de gebruiker database.
-app.get("/api/users", (req, res, next) => {
+app.get("/api/user", (req, res, next) => {
   res.status(202).json({
     status: 202,
     result: userDatabase,
@@ -47,7 +47,7 @@ app.get("/api/users", (req, res, next) => {
 
 //Het opvragen van een persoonlijk gebruikers profiel
 //Toont alleen een melding dat de functionaliteit niet werkt omdat dat niet gerealizeerd hoefde te worden.
-app.get("/api/users/profile", (req, res) => {
+app.get("/api/user/profile", (req, res) => {
   res.status(203).json({
     status: 203,
     result: "Deze functionaliteit is nog niet gerealiseerd.",
@@ -55,7 +55,7 @@ app.get("/api/users/profile", (req, res) => {
 });
 
 //Een specifieke gebruiker opvragen uit de gebruiker database.
-app.get("/api/users/:userId", (req, res, next) => {
+app.get("/api/user/:userId", (req, res, next) => {
   const userId = req.params.userId;
   let user = database.filter((item) => item.id == userId);
   console.log(`User met ID ${id} gezocht`);
@@ -73,7 +73,7 @@ app.get("/api/users/:userId", (req, res, next) => {
 });
 
 //Verander een specifieke gebruiker uit de gebruiker database.
-app.put("/api/users/:userId", (req, res, next) => {
+app.put("/api/user/:userId", (req, res, next) => {
   const userId = req.params.userId;
   let user = database.filter((item) => item.id == userId);
   console.log(`User met ID ${id} gezocht`);
@@ -91,7 +91,7 @@ app.put("/api/users/:userId", (req, res, next) => {
 });
 
 //Verwijder een gebruiker uit de gebruiker database
-app.delete("/api/users/:userId", (req, res, next) => {
+app.delete("/api/user/:userId", (req, res, next) => {
   const userId = req.params.userId;
   let user = database.filter((item) => item.id == userId);
   console.log(`User met ID ${id} gezocht`);
