@@ -83,7 +83,6 @@ app.put("/api/user/:userId", (req, res) => {
 
     //Opnieuw toevoegen aan de database.
     let user = req.body;
-    userId++;
     user = {
       userId,
       ...user,
@@ -110,6 +109,7 @@ app.delete("/api/user/:userId", (req, res) => {
     //Verwijderen uit de database.
     const index = userDatabase.indexOf(user);
     userDatabase.slice(index, 1);
+    userId--;
 
     res.status(206).json({
       status: 206,
