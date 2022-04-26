@@ -1,7 +1,28 @@
+const asser = require("assert");
 let userDatabase = [];
 let id = 0;
 
 let controller = {
+  validateUser: (req, res, next) => {
+    let user = req.body;
+    let { firstName, lastName, emailAdress, password } = user;
+    try {
+      asser(typeof firstName === "String", "firstName must be a string");
+      asser(typeof lastName === "String", "lastName must be a string");
+      asser(typeof emailAdress === "String", "emailAdress must be a string");
+      asser(typeof password === "String", "password must be a string");
+      next();
+    } catch (error) {
+      console.log(err);
+      res.status(400).json({
+        status: 400,
+        result: err.toString(),
+      });
+    }
+
+    next();
+  },
+
   //201 - Toevoegen van een gebruiker aan de gebruiker database.
   addUser: (req, res) => {
     let user = req.body;
