@@ -12,15 +12,13 @@ let controller = {
       asser(typeof emailAdress === "String", "emailAdress must be a string");
       asser(typeof password === "String", "password must be a string");
       next();
-    } catch (error) {
-      console.log(err);
-      res.status(400).json({
+    } catch (err) {
+      const error = {
         status: 400,
-        result: err.toString(),
-      });
+        result: err.message,
+      };
     }
-
-    next();
+    next(err);
   },
 
   //201 - Toevoegen van een gebruiker aan de gebruiker database.
@@ -55,7 +53,7 @@ let controller = {
   },
 
   //204 - Een specifieke gebruiker opvragen uit de gebruiker database.
-  getSpecificUser: (req, res) => {
+  getSpecificUser: (req, res, next) => {
     const userId = req.params.userId;
     let user = userDatabase.filter((item) => item.id == userId);
     if (user.length > 0) {
@@ -65,10 +63,11 @@ let controller = {
         result: user,
       });
     } else {
-      res.status(401).json({
-        status: 401,
-        result: `User with ID ${userId} not found`,
-      });
+      const error = {
+        status: 404,
+        result: "User with Id not found",
+      };
+      next(error);
     }
   },
 
