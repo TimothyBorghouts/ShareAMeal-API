@@ -18,6 +18,7 @@ let controller = {
         status: 400,
         result: err.message,
       };
+      next(error);
     }
     next(err);
   },
@@ -123,28 +124,26 @@ let controller = {
   },
 
   //206 - Verwijder een gebruiker uit de gebruiker database
-  deleteUser:
-    (req,
-    (res) => {
-      const userId = req.params.userId;
-      let user = userDatabase.filter((item) => item.id == userId);
-      if (user.length > 0) {
-        //Verwijderen uit de database.
-        const index = userDatabase.indexOf(user);
-        userDatabase.slice(index, 1);
-        id--;
+  deleteUser: (req, res) => {
+    const userId = req.params.userId;
+    let user = userDatabase.filter((item) => item.id == userId);
+    if (user.length > 0) {
+      //Verwijderen uit de database.
+      const index = userDatabase.indexOf(user);
+      userDatabase.slice(index, 1);
+      id--;
 
-        res.status(206).json({
-          status: 206,
-          result: "Gebruiker is verwijderd uit de database",
-        });
-      } else {
-        res.status(401).json({
-          status: 401,
-          result: `User with ID ${userId} not found`,
-        });
-      }
-    }),
+      res.status(206).json({
+        status: 206,
+        result: "Gebruiker is verwijderd uit de database",
+      });
+    } else {
+      res.status(401).json({
+        status: 401,
+        result: `User with ID ${userId} not found`,
+      });
+    }
+  },
 };
 
-modeule.exports.controller;
+module.exports.controller;
