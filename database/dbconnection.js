@@ -12,8 +12,8 @@ var pool = mysql.createPool({
 
 module.exports = pool;
 
-pool.on("enqueue", function () {
-  console.log("Waiting for available connection slot");
+pool.on("acquire", function (connection) {
+  console.log("Connection %d acquired", connection.threadId);
 });
 
 pool.on("release", function (connection) {

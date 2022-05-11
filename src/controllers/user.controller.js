@@ -1,17 +1,28 @@
 const asser = require("assert");
 const pool = require("../../database/dbconnection");
-let userDatabase = [];
-let id = 0;
+const dbconnection = require("../../database/dbconnection");
 
 let controller = {
   validateUser: (req, res, next) => {
     let user = req.body;
-    let { firstName, lastName, emailAdress, password } = user;
+    let {
+      id,
+      firstName,
+      lastName,
+      isActive,
+      emailAdress,
+      password,
+      phoneNumber,
+      roles,
+      street,
+      city,
+    } = user;
     try {
-      asser(typeof firstName === "String", "firstName must be a string");
-      asser(typeof lastName === "String", "lastName must be a string");
-      asser(typeof emailAdress === "String", "emailAdress must be a string");
-      asser(typeof password === "String", "password must be a string");
+      asser(typeof firstName === "string", "firstName must be a string");
+      asser(typeof lastName === "string", "lastName must be a string");
+      asser(typeof isActive === "number", "isActive must be a number");
+      asser(typeof emailAdress === "string", "emailAdress must be a string");
+      asser(typeof password === "string", "password must be a string");
       next();
     } catch (err) {
       const error = {
@@ -20,84 +31,97 @@ let controller = {
       };
       next(error);
     }
-    next(err);
   },
 
-  //201 - Toevoegen van een gebruiker aan de gebruiker database.
+  //UC-201 - Toevoegen van een gebruiker aan de gebruiker database.
   addUser: (req, res) => {
     let user = req.body;
-    id++;
-    user = {
-      id,
-      ...user,
-    };
-    userDatabase.push(user);
-    res.status(201).json({
-      status: 201,
-      result: userDatabase,
-    });
-  },
+    console.log(user);
 
-  //202 - Bekijken van alle gebruikers in de gebruiker database.
-  getAllUsers: (req, res) => {
-    pool.getConnection(function (err, connection) {
-      if (err) throw err; // not connected!
+    //Maak verbinding met de database en voeg de gegeven gebruiker toe.
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
 
-      // Use the connection
       connection.query(
-        "SELECT something FROM sometable",
+        1,
+        "Mariëtte",
+        "van den Dullemen",
+        1,
+        "m.vandullemen@server.nl",
+        "secret",
+        "",
+        "",
+        "",
+        "",
         function (error, results, fields) {
-          // When done with the connection, release it.
           connection.release();
-
-          // Handle error after the release.
-          if (error) throw error;
-
-          // Don't use the connection here, it has been returned to the pool.
-          console.log("result = ", results);
-          res.status(200).json,
-            {
-              statusCode: 200,
-              results: results,
-            };
-
-          // pool.end((err) => {
-          //   console.log("pool was closed");
-          // });
+          if (err) throw err;
         }
       );
     });
+
+    //Stuur de toegevoegde gebruiker terug.
+    res.status(201).json({
+      status: 201,
+      result: results,
+    });
   },
 
-  //203 - Het opvragen van een persoonlijk gebruikers profiel
+  //UC-202 - Bekijken van alle gebruikers in de gebruiker database.
+  getAllUsers: (req, res) => {
+    //Maak verbinding met de database en haal alle gebruikers op.
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query("SELECT * FROM user", function (error, results, fields) {
+        connection.release();
+        if (error) throw error;
+
+        //Stuur alle opgehaalde gebruikers terug.
+        console.log("result =" + results);
+        res.status(202).json({
+          statusCode: 202,
+          results: results,
+        });
+      });
+    });
+  },
+
+  //UC-203 - Het opvragen van een persoonlijk gebruikers profiel
   getUserProfile: (req, res) => {
+    //Stuur dat een persoonlijk profiel nog niet kan worden opgevraagt.
     res.status(203).json({
       status: 203,
       result: "Deze functionaliteit is nog niet gerealiseerd.",
     });
   },
 
-  //204 - Een specifieke gebruiker opvragen uit de gebruiker database.
-  getSpecificUser: (req, res, next) => {
+  //UC-204 - Een specifieke gebruiker opvragen uit de gebruiker database.
+  getUserById: (req, res, next) => {
+    //Verkrijg de gevraagde id
     const userId = req.params.userId;
-    let user = userDatabase.filter((item) => item.id == userId);
-    if (user.length > 0) {
-      console.log(user);
-      res.status(204).json({
-        status: 204,
-        result: user,
-      });
-    } else {
-      const error = {
-        status: 404,
-        result: "User with Id not found",
-      };
-      next(error);
-    }
+
+    //Maak verbinding met de database en haal de gebruiker met het id op
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query(
+        "SELECT * FROM user Where id=1",
+        function (error, results, fields) {
+          connection.release();
+          if (error) throw error;
+
+          //Stuur de opgehaalde gebruiker terug.
+          console.log("result =" + results);
+          res.status(204).json({
+            status: 204,
+            result: results,
+          });
+        }
+      );
+    });
   },
 
-  //205 - Verander een specifieke gebruiker uit de gebruiker database.
-  changeUser: (req, res) => {
+  //UC-205 - Verander een specifieke gebruiker uit de gebruiker database.
+  updateUserById: (req, res) => {
     const userId = req.params.userId;
     let user = userDatabase.filter((item) => item.id == userId);
     if (user.length > 0) {
@@ -123,8 +147,8 @@ let controller = {
     }
   },
 
-  //206 - Verwijder een gebruiker uit de gebruiker database
-  deleteUser: (req, res) => {
+  //UC-206 - Verwijder een gebruiker uit de gebruiker database
+  deleteUserById: (req, res) => {
     const userId = req.params.userId;
     let user = userDatabase.filter((item) => item.id == userId);
     if (user.length > 0) {
@@ -146,4 +170,4 @@ let controller = {
   },
 };
 
-module.exports.controller;
+module.exports = controller;

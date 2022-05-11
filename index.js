@@ -2,7 +2,9 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT;
+
 const bodyParser = require("body-parser");
+
 const router = require("./src/routes/user.route");
 
 app.use(bodyParser.json());
@@ -23,7 +25,7 @@ app.all("*", (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(err, status).json(err);
+  res.status(err.status).json(err);
 });
 
 app.listen(port, () => {

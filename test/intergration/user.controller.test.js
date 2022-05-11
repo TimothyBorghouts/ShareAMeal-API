@@ -8,7 +8,7 @@ chai.use(chaiHttps);
 
 describe("Manage users", () => {
   describe("UC - 201 add users", () => {
-    beforeEach(() => {
+    beforeEach((done) => {
       database = [];
       done();
     });
@@ -16,10 +16,11 @@ describe("Manage users", () => {
     it("When a required input is missing, a valid error should be returned", (done) => {
       chai
         .request(server)
-        .post("/api/movie")
+        .post("/api/user")
         .send({
-          year: 2005,
-          studio: "pixar",
+          email: "timothyborghouts@gmail.com",
+          age: 16,
+          password: "password123",
         })
         .end((err, res) => {
           res.should.be.an("object");
