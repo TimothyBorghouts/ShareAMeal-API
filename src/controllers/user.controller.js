@@ -1,5 +1,6 @@
 const dbconnection = require("../../database/dbconnection");
 const assert = require("assert");
+const logger = require("../config/config").logger;
 
 let controller = {
   validateUser: (req, res, next) => {
@@ -16,6 +17,7 @@ let controller = {
 
       next();
     } catch (err) {
+      logger.debug("Wrong user input");
       const error = {
         status: 400,
         message: err.message,
@@ -34,16 +36,18 @@ let controller = {
         `INSERT INTO user (firstName, lastName, emailAdress, password, street, city) VALUES(?,?,?,?,?,?);`,
         [firstName, lastName, emailAdress, password, street, city],
         function (error, results, fields) {
+          connection.release();
           if (error) {
-            connection.release();
+            logger.debug(
+              "Could not add user to database, email alreadt exists."
+            );
             res.status(409).json({
               status: 409,
               message:
                 "Gebruiker met emailaddress " + emailAdress + " bestaat al.",
             });
           } else {
-            connection.release();
-            console.log("Result = " + user);
+            logger.debug("Added user to database with addUser.");
             res.status(201).json({
               status: 201,
               result: user,
@@ -56,15 +60,13 @@ let controller = {
 
   //UC-202 - Bekijken van alle gebruikers.
   getAllUsers: (req, res) => {
-    //Maak verbinding met de database en haal alle gebruikers op.
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(`SELECT * FROM user`, function (error, results, fields) {
         connection.release();
         if (error) throw error;
 
-        //Stuur alle opgehaalde gebruikers terug.
-        console.log("Result = " + results);
+        logger.debug("Found all the users with getAllUsers.");
         res.status(202).json({
           statusCode: 202,
           results: results,
@@ -75,22 +77,9 @@ let controller = {
 
   //UC-203 - Het opvragen van een persoonlijk gebruikers profiel.
   getUserProfile: (req, res) => {
-    //Stuur dat een persoonlijk profiel nog niet kan worden opgevraagt.
-    console.log("Result = Deze functie is niet gerealiseerd");
-    res.status(203).json({
-      status: 203,
-      result: "Deze functionaliteit is nog niet gerealiseerd.",
-    });
-  },
-
-  //UC-204 - Een specifieke gebruiker opvragen.
-  getUserById: (req, res) => {
-    //Haal de gegeven gebruiker id op.
-    const userId = req.params.userId;
-    console.log("Input = " + userId);
+    const userId = req.userId;
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      //Haal de gebruiker met het id op.
       connection.query(
         `SELECT * FROM user Where id = ?`,
         [userId],
@@ -98,11 +87,43 @@ let controller = {
           connection.release();
 
           if (results.length > 0) {
+            logger.debug("Found a user with getUserProfile.");
             res.status(200).json({
               status: 200,
               result: results[0],
             });
           } else {
+            logger.debug("Found no user with getUserProfile.");
+            res.status(404).json({
+              status: 404,
+              message: "User with Id " + userId + " not found.",
+            });
+          }
+        }
+      );
+    });
+  },
+
+  //UC-204 - Een specifieke gebruiker opvragen.
+  getUserById: (req, res) => {
+    const userId = req.params.userId;
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query(
+        `SELECT * FROM user Where id = ?`,
+        [userId],
+        function (error, results, fields) {
+          connection.release();
+          if (error) throw error;
+
+          if (results.length > 0) {
+            logger.debug("Found specific user with getUserById.");
+            res.status(200).json({
+              status: 200,
+              result: results[0],
+            });
+          } else {
+            logger.debug("No user found with getUserById.");
             res.status(404).json({
               status: 404,
               message: "User with Id " + userId + " not found.",
@@ -115,30 +136,18 @@ let controller = {
 
   //UC-205 - Verander een specifieke gebruiker.
   updateUserById: (req, res) => {
-    //Haal de gegeven gebruiker id op.
     const userId = req.params.userId;
-    console.log("Input = " + userId);
     let user = req.body;
     let { firstName, lastName, emailAdress, password, street, city } = user;
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      //Check of de gebruiker wel bestaat voor het verwijderen.
       connection.query(
         "SELECT * FROM user Where id = " + userId,
         function (error, results, fields) {
           if (error) throw error;
 
-          //Stuur dat de gebruiker niet bestaat binnen de database
-          if (results.length == 0) {
-            //Als de gebruiker niet bestaat wordt de connectie hier ook vroegtijdig afgebroken
-            connection.release();
-            return res.status(400).json({
-              status: 400,
-              message: "Gebruiker met Id " + userId + " bestaat niet",
-            });
-          } else {
-            //Update de gebruiker in de database wanneer deze bestaat.
+          if (results.length > 0) {
             connection.query(
               `UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, street = ?, city = ? WHERE id = ${userId}`,
               [firstName, lastName, emailAdress, password, street, city],
@@ -146,14 +155,20 @@ let controller = {
                 connection.release();
                 if (error) throw error;
 
-                //Stuur de geupdate gebruiker terug.
-                console.log("Result = " + results);
+                logger.debug("Updated user with updateUserById.");
                 res.status(200).json({
                   status: 200,
                   result: user,
                 });
               }
             );
+          } else {
+            logger.debug("User was not found with updateUserById.");
+            connection.release();
+            res.status(400).json({
+              status: 400,
+              message: "Gebruiker met Id " + userId + " bestaat niet",
+            });
           }
         }
       );
@@ -162,42 +177,35 @@ let controller = {
 
   //UC-206 - Verwijder een gebruiker.
   deleteUserById: (req, res) => {
-    //Haal de gegeven gebruiker id op.
     const userId = req.params.userId;
-    console.log("Input = " + userId);
-
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      //Check of de gebruiker wel bestaat voor het verwijderen.
       connection.query(
         "SELECT * FROM user Where id = " + userId,
         function (error, results, fields) {
           if (error) throw error;
 
-          //Stuur dat de gebruiker niet bestaat binnen de database
-          if (results.length == 0) {
-            //Als de gebruiker niet bestaat wordt de connectie hier ook vroegtijdig afgebroken
-            connection.release();
-            return res.status(400).json({
-              status: 400,
-              result: "Gebruiker met Id " + userId + " bestaat niet",
-            });
-          } else {
-            //Verwijder de gebruiker uit de database als deze gebruiker bestaat.
+          if (results.length > 0) {
             connection.query(
               "DELETE FROM user Where id = " + userId,
               function (error, results, fields) {
                 connection.release();
                 if (error) throw error;
 
-                //Stuur alle gebruikers waar de verwijderde niet meer in staat.
-                console.log("Result = gebruiker is uit de database verwijderd");
+                logger.debug("Deleted user with deleteUserById.");
                 res.status(200).json({
                   status: 200,
                   result: "Gebuiker is uit de database verwijderd",
                 });
               }
             );
+          } else {
+            logger.debug("User was not found with deleteUserById.");
+            connection.release();
+            res.status(400).json({
+              status: 400,
+              result: "Gebruiker met Id " + userId + " bestaat niet",
+            });
           }
         }
       );

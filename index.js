@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 
-require("dotenv").config();
 const port = process.env.PORT;
 
 const bodyParser = require("body-parser");
@@ -10,11 +9,13 @@ app.use(bodyParser.json());
 const authRoutes = require("./src/routes/auth.routes");
 const userRoutes = require("./src/routes/user.routes");
 const mealRoutes = require("./src/routes/meal.routes");
+const logger = require("./src/config/config").logger;
+require("dotenv").config();
 
 //Logs the request from the user.
 app.all("*", (req, res, next) => {
   const method = req.method;
-  console.log(`\nMethod ${method} is aangeroepen`);
+  logger.debug(`\nMethod ${method} is aangeroepen`);
   next();
 });
 
@@ -33,12 +34,27 @@ app.all("*", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  res.status(err.status).json(err);
+  logger.debug("Error handler called.");
+  res.status(500).json({
+    statusCode: 500,
+    message: err.toString(),
+  });
 });
 
-//Logs the start of the server.
+// Messages when server opens
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  logger.debug("Server started");
+});
+
+process.on("SIGINT", () => {
+  logger.debug("SIGINT signal received: closing HTTP server");
+  dbconnection.end((err) => {
+    logger.debug("Database connection closed");
+  });
+  //Messages when server closes
+  app.close(() => {
+    logger.debug("Server closed");
+  });
 });
 
 module.exports = app;

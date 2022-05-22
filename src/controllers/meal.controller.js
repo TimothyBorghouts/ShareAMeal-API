@@ -1,33 +1,63 @@
 const dbconnection = require("../../database/dbconnection");
-const asser = require("assert");
+const assert = require("assert");
+const logger = require("../config/config").logger;
 
 let controller = {
-  //UC-301 - Toevoegen van een maaltijd.
-  addMeal: (req, res) => {
+  validateMeal: (req, res, next) => {
     let meal = req.body;
     let {
+      name,
+      description,
+      price,
       isActive,
       isVega,
       isVegan,
       isToTakeHome,
-      dateTime,
-      maxAmountOfParticipants,
-      price,
       imageUrl,
-      cookId,
-      createDate,
-      updateDate,
-      name,
-      description,
-      allergenes,
+      dateTime,
     } = meal;
 
-    //Maak verbinding met de database en voeg de gegeven gebruiker toe.
+    try {
+      assert(typeof name === "string", "Name must be a string");
+      assert(typeof description === "string", "Description must be a string!");
+      assert(typeof price === "number", "Price must be a number");
+      assert(isActive != null, "isActive is invalid");
+      assert(isVega != null, "isVega is invalid");
+      assert(isVegan != null, "isVegan is invalid");
+      assert(isToTakeHome != null, "isToTakeHome is invalid");
+      assert(typeof imageUrl === "string", "Image url must be a string");
+      assert(typeof dateTime === "string", "DateTime must be a string");
+
+      next();
+    } catch (err) {
+      logger.debug("Wrong meal input");
+      const error = {
+        status: 400,
+        message: err.message,
+      };
+      next(error);
+    }
+  },
+
+  //UC-301 - Toevoegen van een maaltijd.
+  addMeal: (req, res) => {
+    let meal = req.body;
+    let {
+      name,
+      description,
+      price,
+      isActive,
+      isVega,
+      isVegan,
+      isToTakeHome,
+      imageUrl,
+      dateTime,
+    } = meal;
+
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-
       connection.query(
-        `INSERT INTO user ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, createDate, updateDate, name, description, allergenes,) VALUES(?,?,?,?,?,?);`,
+        `INSERT INTO user ( name, description, price, isActive, isVega, isVegan, isToTakeHome, imageUrl, dateTime) VALUES(?,?,?,?,?,?,?,?,?);`,
         [
           isActive,
           isVega,
@@ -48,8 +78,7 @@ let controller = {
           connection.release();
           if (err) throw err;
 
-          //Stuur de toegevoegde maaltijd terug.
-          console.log("Result = " + results);
+          logger.debug("Added meal to database with addMeal.");
           res.status(301).json({
             status: 301,
             result: "Maaltijd is toegevoegt aan de database",
@@ -61,15 +90,13 @@ let controller = {
 
   //UC-302 - Bekijken van alle maaltijden.
   getAllMeals: (req, res) => {
-    //Maak verbinding met de database en haal alle maaltijden op.
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(`SELECT * FROM meal`, function (error, results, fields) {
         connection.release();
         if (error) throw error;
 
-        //Stuur alle opgehaalde maaltijden terug.
-        console.log("Result = " + results);
+        logger.debug("Found all the meals with getAllMeals.");
         res.status(302).json({
           statusCode: 302,
           results: results,
@@ -79,34 +106,28 @@ let controller = {
   },
 
   //UC-303 - Een specifieke maaltijd opvragen.
-  getMealById: (req, res, next) => {
+  getMealById: (req, res) => {
     const mealId = req.params.mealId;
-    console.log("Input = " + mealId);
-
-    //Maak verbinding met de database.
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-
-      //Haal de maaltijd met het id op.
       connection.query(
-        `SELECT * FROM meal Where id = ` + mealId,
+        `SELECT * FROM meal Where id = ?`,
+        [mealId],
         function (error, results, fields) {
           connection.release();
           if (error) throw error;
 
-          //Check of de maaltijd met dat id wel bestaat en geeft een foutmelding zo niet.
-          if (results.length === 0) {
-            console.log("Result = De gebruiker is niet gevonden");
-            return res.status(404).json({
-              status: 404,
-              result: "Gebruiker met Id " + userId + " bestaat niet",
-            });
-          } else {
-            //Stuur de opgehaalde maaltijd terug.
-            console.log("Result = " + results);
+          if (results.length > 0) {
+            logger.debug("Found specific meal with getMealById.");
             res.status(303).json({
               status: 303,
-              result: results,
+              result: results[0],
+            });
+          } else {
+            logger.debug("No user found with getMealById.");
+            res.status(404).json({
+              status: 404,
+              result: "Maaltijd met Id " + mealId + " bestaat niet",
             });
           }
         }
@@ -116,48 +137,48 @@ let controller = {
 
   //UC-304 - Verander een specifieke maaltijd.
   updateMealById: (req, res) => {
-    //Haal de gegeven gebruiker id op.
-    const userId = req.params.userId;
-    console.log("Input = " + userId);
-    let user = req.body;
+    const mealId = req.params.userId;
+    let meal = req.body;
+    let {
+      name,
+      description,
+      price,
+      isActive,
+      isVega,
+      isVegan,
+      isToTakeHome,
+      imageUrl,
+      dateTime,
+    } = meal;
 
-    //Maak verbinding met de database.
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-
-      //Check of de gebruiker wel bestaat voor het verwijderen.
       connection.query(
         "SELECT * FROM user Where id = " + userId,
         function (error, results, fields) {
           if (error) throw error;
 
-          //Stuur dat de gebruiker niet bestaat binnen de database
-          if (results.length === 0) {
-            //Als de gebruiker niet bestaat wordt de connectie hier ook vroegtijdig afgebroken
-            connection.release();
-            return res.status(404).json({
-              status: 404,
-              result: "Gebruiker met Id " + userId + " bestaat niet",
-            });
-          } else {
-            //Update de gebruiker in de database wanneer deze bestaat.
-            let userFirstName = user.firstname;
-            let userLastName = user.lastname;
-            let userPhoneNumber = user.phonenumber;
+          if (results.length > 0) {
             connection.query(
-              `UPDATE user SET firstName = '${userFirstName}', lastName = '${userLastName}', isActive = '${user.isActive}', emailAdress = '${user.emailAdress}', password = '${user.password}', phoneNumber = '${userPhoneNumber}', street = '${user.street}', city = '${user.city}' WHERE id = ${userId}`,
+              `UPDATE meal SET firstName = ?, lastName = ?, isActive = ?, emailAdress = ?, password = ?, phoneNumber = ?, street = ?, city = ? WHERE id = ${mealId}`,
               function (error, results, fields) {
                 connection.release();
                 if (error) throw error;
 
-                //Stuur de geupdate gebruiker terug.
-                console.log("Result = " + results);
-                res.status(205).json({
-                  status: 205,
-                  result: "Gebruiker is aangepast",
+                logger.debug("Updated meal with updateMealById.");
+                res.status(304).json({
+                  status: 304,
+                  result: meal,
                 });
               }
             );
+          } else {
+            logger.debug("Meal was not found with updateMealById.");
+            connection.release();
+            return res.status(404).json({
+              status: 404,
+              result: "Maaltijd met Id " + mealId + " bestaat niet",
+            });
           }
         }
       );
@@ -166,44 +187,35 @@ let controller = {
 
   //UC-305 - Verwijder een maaltijd.
   deleteMealById: (req, res) => {
-    //Haal de gegeven gebruiker id op.
     const userId = req.params.userId;
-    console.log("Input = " + userId);
-
-    //Maak verbinding met de database.
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-
-      //Check of de gebruiker wel bestaat voor het verwijderen.
       connection.query(
         "SELECT * FROM user Where id = " + userId,
         function (error, results, fields) {
           if (error) throw error;
 
-          //Stuur dat de gebruiker niet bestaat binnen de database
-          if (results.length === 0) {
-            //Als de gebruiker niet bestaat wordt de connectie hier ook vroegtijdig afgebroken
-            connection.release();
-            return res.status(404).json({
-              status: 404,
-              result: "Gebruiker met Id " + userId + " bestaat niet",
-            });
-          } else {
-            //Verwijder de gebruiker uit de database als deze gebruiker bestaat.
+          if (results.length > 0) {
             connection.query(
               "DELETE FROM user Where id = " + userId,
               function (error, results, fields) {
                 connection.release();
                 if (error) throw error;
 
-                //Stuur alle gebruikers waar de verwijderde niet meer in staat.
-                console.log("Result = gebruiker is uit de database verwijderd");
-                res.status(206).json({
-                  status: 206,
-                  result: "Gebuiker is uit de database verwijderd",
+                logger.debug("Deleted meal with deleteMealById.");
+                res.status(305).json({
+                  status: 305,
+                  result: "Maaltijd is uit de database verwijderd",
                 });
               }
             );
+          } else {
+            logger.debug("Meal was not found with deleteMealById.");
+            connection.release();
+            res.status(400).json({
+              status: 400,
+              result: "Maaltijd met Id " + mealId + " bestaat niet",
+            });
           }
         }
       );
