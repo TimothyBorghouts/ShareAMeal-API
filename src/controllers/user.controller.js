@@ -18,7 +18,7 @@ let controller = {
     } catch (err) {
       const error = {
         status: 400,
-        result: err.message,
+        message: err.message,
       };
       next(error);
     }
@@ -38,7 +38,7 @@ let controller = {
             connection.release();
             res.status(409).json({
               status: 409,
-              result:
+              message:
                 "Gebruiker met emailaddress " + emailAdress + " bestaat al.",
             });
           } else {
@@ -105,7 +105,7 @@ let controller = {
           } else {
             res.status(404).json({
               status: 404,
-              result: "User with Id " + userId + " not found.",
+              message: "User with Id " + userId + " not found.",
             });
           }
         }
@@ -135,7 +135,7 @@ let controller = {
             connection.release();
             return res.status(400).json({
               status: 400,
-              result: "Gebruiker met Id " + userId + " bestaat niet",
+              message: "Gebruiker met Id " + userId + " bestaat niet",
             });
           } else {
             //Update de gebruiker in de database wanneer deze bestaat.
