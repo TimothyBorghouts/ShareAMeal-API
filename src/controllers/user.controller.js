@@ -1,59 +1,54 @@
 const dbconnection = require("../../database/dbconnection");
-const asser = require("assert");
+const assert = require("assert");
 
 let controller = {
-  // validateUser: (req, res, next) => {
-  //   let user = req.body;
-  //   let {
-  //     firstName,
-  //     lastName,
-  //     isActive,
-  //     emailAdress,
-  //     password,
-  //     phoneNumber,
-  //     street,
-  //     city,
-  //   } = user;
-
-  //   try {
-  //     asser(typeof firstName === "string", "firstName must be a string");
-  //     asser(typeof lastName === "string", "lastName must be a string");
-  //     asser(typeof isActive === "number", "isActive must be a number");
-  //     asser(typeof emailAdress === "string", "emailAdress must be a string");
-  //     asser(typeof password === "string", "password must be a string");
-  //     assert(typeof phoneNumber === "string", "phonenumber must be a string");
-  //     assert(typeof street === "string", "street must be a string");
-  //     assert(typeof city === "string", "city must be a string");
-  //     next();
-  //   } catch (err) {
-  //     const error = {
-  //       status: 400,
-  //       result: err.message,
-  //     };
-  //     next(error);
-  //   }
-  // },
-
-  //UC-201 - Toevoegen van een gebruiker.
-  addUser: (req, res) => {
+  validateUser: (req, res, next) => {
     let user = req.body;
     let { firstName, lastName, emailAdress, password, street, city } = user;
 
-    //Maak verbinding met de database en voeg de gegeven gebruiker toe.
+    try {
+      assert(typeof firstName === "string", "Firstname must be a string.");
+      assert(typeof lastName === "string", "Lastname must be a string.");
+      assert(typeof emailAdress === "string", "Emailaddress must be a string.");
+      assert(typeof password === "string", "Password must be a string.");
+      assert(typeof street === "string", "Street must be a string.");
+      assert(typeof city === "string", "City must be a string.");
+
+      next();
+    } catch (err) {
+      const error = {
+        status: 400,
+        result: err.message,
+      };
+      next(error);
+    }
+  },
+
+  //UC-201 - Toevoegen van een gebruiker.
+  addUser: (req, res, next) => {
+    let user = req.body;
+    let { firstName, lastName, emailAdress, password, street, city } = user;
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
         `INSERT INTO user (firstName, lastName, emailAdress, password, street, city) VALUES(?,?,?,?,?,?);`,
         [firstName, lastName, emailAdress, password, street, city],
         function (error, results, fields) {
-          connection.release();
-          if (error) throw error;
-
-          console.log("Result = " + user);
-          res.status(201).json({
-            status: 201,
-            result: user,
-          });
+          if (error) {
+            connection.release();
+            res.status(409).json({
+              status: 409,
+              result:
+                "Gebruiker met emailaddress " + emailAdress + " bestaat al.",
+            });
+          } else {
+            connection.release();
+            console.log("Result = " + user);
+            res.status(201).json({
+              status: 201,
+              result: user,
+            });
+          }
         }
       );
     });

@@ -3,7 +3,7 @@ const router = express.Router();
 const userController = require("../controllers/user.controller");
 
 //UC-201 - Toevoegen van een gebruiker.
-router.post("/api/user", userController.addUser);
+router.post("/api/user", userController.validateUser, userController.addUser);
 
 //UC-202 - Bekijken van alle gebruikers.
 router.get("/api/user", userController.getAllUsers);
