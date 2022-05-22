@@ -39,18 +39,42 @@ When the API is up and running you can send requests to get, change or delete da
 There is documentation where you can find more information about the requests.
 [Click here to open the swagger document.](https://shareameal-api.herokuapp.com/docs/)
 
+## example
+
+When you want to see all users you can use the following link:
+[Click here to open the link](https://share-a-meal-timothy-borghouts.herokuapp.com/api/user)
+
+You will see the results that the API sends back to you. You will get different users with different information.
+
+```
+{"statusCode":202,"results":
+    [
+        {"id":1,"firstName":"Mariëtte","lastName":"van den Dullemen","isActive":1,"emailAdress":"m.vandullemen@server.nl","password":"secret","phoneNumber":"","roles":"","street":"","city":""},
+        {"id":2,"firstName":"John","lastName":"Doe","isActive":1,"emailAdress":"j.doe@server.com","password":"secret","phoneNumber":"06 12425475","roles":"editor,guest","street":"","city":""},
+        {"id":3,"firstName":"Herman","lastName":"Huizinga","isActive":1,"emailAdress":"h.huizinga@server.nl","password":"secret","phoneNumber":"06-12345678","roles":"editor,guest","street":"","city":""},
+    ]
+}
+
+```
+
 ## Tools
 
-Various tools were used to build the Share a meal API.
+Various tools and libraries were used to build the Share a meal API. They are listed below.
 
-| Coding tools       | Node packages | Testing tools    |
-| ------------------ | ------------- | ---------------- |
-| Visual studio code | Express       | Postman          |
-| Nodejs             | Nodemon       | Assertion server |
-|                    | Chai          |                  |
-|                    | jsonwebtoken  |                  |
-|                    | Mysql         |                  |
-|                    |               |                  |
+| Tools and libraries |
+| ------------------- |
+| Nodejs              |
+| Express             |
+| Nodemon             |
+| Chai                |
+| Mocha               |
+| Mysql               |
+| jsonwebtoken        |
+| Mysql               |
+| Assertion server    |
+| Postman             |
+| Visual studio code  |
+| Cmder Mini          |
 
 ## Authors and acknowledgment
 
