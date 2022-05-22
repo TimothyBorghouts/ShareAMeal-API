@@ -138,8 +138,8 @@ let controller = {
           if (results.length == 0) {
             //Als de gebruiker niet bestaat wordt de connectie hier ook vroegtijdig afgebroken
             connection.release();
-            return res.status(404).json({
-              status: 404,
+            return res.status(400).json({
+              status: 400,
               result: "Gebruiker met Id " + userId + " bestaat niet",
             });
           } else {
@@ -153,8 +153,8 @@ let controller = {
 
                 //Stuur de geupdate gebruiker terug.
                 console.log("Result = " + results);
-                res.status(205).json({
-                  status: 205,
+                res.status(200).json({
+                  status: 200,
                   result: user,
                 });
               }
@@ -180,11 +180,11 @@ let controller = {
           if (error) throw error;
 
           //Stuur dat de gebruiker niet bestaat binnen de database
-          if (results.length === 0) {
+          if (results.length == 0) {
             //Als de gebruiker niet bestaat wordt de connectie hier ook vroegtijdig afgebroken
             connection.release();
-            return res.status(404).json({
-              status: 404,
+            return res.status(400).json({
+              status: 400,
               result: "Gebruiker met Id " + userId + " bestaat niet",
             });
           } else {
@@ -197,8 +197,8 @@ let controller = {
 
                 //Stuur alle gebruikers waar de verwijderde niet meer in staat.
                 console.log("Result = gebruiker is uit de database verwijderd");
-                res.status(206).json({
-                  status: 206,
+                res.status(200).json({
+                  status: 200,
                   result: "Gebuiker is uit de database verwijderd",
                 });
               }
