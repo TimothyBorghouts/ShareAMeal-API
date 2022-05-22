@@ -8,12 +8,17 @@ const controller = {
   login: (req, res, next) => {
     //Assert voor validatie
     const { emailAdress, password } = req.body;
-    console.log("");
 
-    const queryString = `SELECT id, firstName, lastName, emailAdress, password FROM user WHERE emailAdress = ?`;
+    const queryString = `SELECT id, firstName, emailAdress, password FROM user WHERE emailAdress = ?`;
     dbconnection.getConnection(function (err, connection) {
       if (err) {
         next(err);
+      }
+
+      if (connection) {
+        console.log("Database connected!");
+      } else {
+        console.log("No connection!");
       }
 
       connection.query(
@@ -83,33 +88,31 @@ const controller = {
   },
 
   validateToken(req, res, next) {
-    logger.info("validateToken called");
-    // logger.trace(req.headers)
-    // The headers should contain the authorization-field with value 'Bearer [token]'
+    console.log("ValidateToken called");
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      logger.warn("Authorization header missing!");
+      console.log("no authorization header!");
       res.status(401).json({
-        error: "Authorization header missing!",
-        datetime: new Date().toISOString(),
+        error: "No authorization header",
+        dateTime: new Data().toISOString(),
       });
     } else {
-      // Strip the word 'Bearer ' from the headervalue
       const token = authHeader.substring(7, authHeader.length);
 
       jwt.verify(token, jwtSecretKey, (err, payload) => {
         if (err) {
-          logger.warn("Not authorized");
+          console.log("Not authorized");
           res.status(401).json({
             error: "Not authorized",
             datetime: new Date().toISOString(),
           });
         }
         if (payload) {
-          logger.debug("token is valid", payload);
+          console.log("token is valid", payload);
           // User heeft toegang. Voeg UserId uit payload toe aan
           // request, voor ieder volgend endpoint.
-          req.userId = payload.userId;
+          req.userId = payload.userid;
+          console.log("userId = ", payload.userid);
           next();
         }
       });

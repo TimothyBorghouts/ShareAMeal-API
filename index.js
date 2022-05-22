@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 
@@ -10,12 +11,11 @@ const authRoutes = require("./src/routes/auth.routes");
 const userRoutes = require("./src/routes/user.routes");
 const mealRoutes = require("./src/routes/meal.routes");
 const logger = require("./src/config/config").logger;
-require("dotenv").config();
 
 //Logs the request from the user.
 app.all("*", (req, res, next) => {
   const method = req.method;
-  logger.debug(`\nMethod ${method} is aangeroepen`);
+  logger.debug(`Method ${method} is aangeroepen`);
   next();
 });
 
@@ -35,15 +35,12 @@ app.all("*", (req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   logger.debug("Error handler called.");
-  res.status(500).json({
-    statusCode: 500,
-    message: err.toString(),
-  });
+  res.status(err.status).json(err);
 });
 
 // Messages when server opens
 app.listen(port, () => {
-  logger.debug("Server started");
+  logger.debug("Server started on port " + port);
 });
 
 process.on("SIGINT", () => {
