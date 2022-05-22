@@ -15,7 +15,11 @@ router.get("/api/user/profile", userController.getUserProfile);
 router.get("/api/user/:userId", userController.getUserById);
 
 //UC-205 - Verander een specifieke gebruiker.
-router.put("/api/user/:userId", userController.updateUserById);
+router.put(
+  "/api/user/:userId",
+  userController.validateUser,
+  userController.updateUserById
+);
 
 //UC-206 - Verwijder specifieke een gebruiker.
 router.delete("/api/user/:userId", userController.deleteUserById);
