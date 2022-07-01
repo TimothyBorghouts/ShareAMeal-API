@@ -19,7 +19,7 @@ let controller = {
       //Regex die checkt of het emailaddress twee punten en een apenstaartje bevatten.
       assert.match(emailAdress, /.+\@.+\..+/, "The is not an correct email address.")
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
-      assert.match(password, /.{8,+}/, "The password is to short.")
+      assert.match(password, /^.[0-9a-zA-Z]{8,}$/, "The password is to short.")
 
       next();
     } catch (err) {
