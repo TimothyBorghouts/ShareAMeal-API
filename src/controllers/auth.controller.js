@@ -1,74 +1,87 @@
-const dbconnection = require("../../database/dbconnection");
-const jwt = require("jsonwebtoken");
 const assert = require("assert");
+const jwt = require("jsonwebtoken");
+const dbconnection = require("../../database/dbconnection");
 const logger = require("../config/config").logger;
 const jwtSecretKey = require("../config/config").jwtSecretKey;
 
-const controller = {
-  login: (req, res, next) => {
-    //Assert voor validatie
-    const { emailAdress, password } = req.body;
+const queryString = `SELECT id, firstName, emailAdress, password FROM user WHERE emailAdress = ?`;
 
-    const queryString = `SELECT id, firstName, emailAdress, password FROM user WHERE emailAdress = ?`;
-    dbconnection.getConnection(function (err, connection) {
+let controller = {
+  //User uses emaal and password to receive a token.
+  login(req, res, next) {
+    logger.info("login is called");
+
+    dbconnection.getConnection((err, connection) => {
       if (err) {
-        next(err);
+        logger.error('No connection from dbconnection.');
+        res.status(500).json({
+          statusCode: 500,
+          message: err.toString(),
+        })
       }
 
+      //dbconnection is succesfully connected
       if (connection) {
-        console.log("Database connected!");
-      } else {
-        console.log("No connection!");
-      }
+      logger.info("Database connected!");
 
-      connection.query(
-        queryString,
-        [emailAdress],
-        function (error, results, fields) {
-          connection.release();
+          //---------------------------------------------------------------------------------------//
+          connection.query(
+            queryString,
+            [req.body.emailAdress],
+            (error, rows, fields) => {
+              connection.release();
 
-          if (error) throw error;
+              if (err) {
+                logger.error('Error: ' , err.toString());
+                res.status(500).json({
+                  statusCode: 500,
+                  message: err.toString(),
+                })
+              }
 
-          if (results && results.length === 1) {
-            //er was een user met dit emailadres.
-            //check of het password klopt.
-            console.log(results);
+              //Kijken of het paswoord bestaat en of er wel een password is ingevoerd.
+              if (rows && rows.length === 1 && rows[0].password == req.body.password) {
+                logger.info("password is correct.");
 
-            const user = results[0];
-            if (user.password === password) {
-              //email en password zijn correct dus we geven het token.
-              jwt.sign(
-                { userid: user.id },
-                "process.env.JWT_SECRET",
-                { expiresIn: "7d" },
-                function (err, token) {
-                  if (err) console.log(err);
-                  if (token) {
-                    console.log(token);
+                const user = rows[0];
+
+                //email en wachtwoord zijn correct dus we geven het token terug.
+                jwt.sign(
+                  { userid: user.id },
+                  jwtSecretKey,
+                  { expiresIn: "30d" },
+                  function (err, token) {
+                    logger.info(token);
                     res.status(200).json({
                       statusCode: 200,
-                      results: token,
+                      message: token,
                     });
                   }
-                }
-              );
-            } else {
+                );
+
+              //email en wachtwoord zijn incorrect dus we geven een error terug.
+              } else {
+                logger.debug("user not found or password incorrect");
+                res.status(401).json({
+                  statusCode: 401,
+                  message: "email or password incorrect",
+                });
+              }
             }
-          } else {
-            // Er was geen user gevonden
-            console.log("user not found");
-            res.status(404).json({
-              statusCode: 404,
-              message: "email not found",
-            });
-          }
-        }
-      );
+          );
+          //---------------------------------------------------------------------------------------------------//
+
+      //dbconnection is not connected
+      } else {
+        logger.info("No connection!");
+      }
     });
   },
 
+  //Check if an email and password is given as a string before login.
   validateLogin(req, res, next) {
-    // Verify that we receive the expected input
+    logger.info("ValidateLogin called");
+
     try {
       assert(
         typeof req.body.emailAdress === "string",
@@ -79,40 +92,42 @@ const controller = {
         "password must be a string."
       );
       next();
-    } catch (error) {
-      res.status(400).json({
-        status: 400,
-        message: error.message,
+    } catch (err) {
+      res.status(422).json({
+        statusCode: 422,
+        message: err.toString(),
       });
     }
   },
 
+  //Check if the token that the user uses is correct before performing other actions.
   validateToken(req, res, next) {
-    console.log("ValidateToken called");
+    logger.info("ValidateToken called");
+
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      console.log("no authorization header!");
+      logger.error("no authorization header!");
       res.status(401).json({
-        error: "No authorization header",
-        dateTime: new Data().toISOString(),
+        statusCode: "401",
+        message: "No authorization header",
       });
     } else {
       const token = authHeader.substring(7, authHeader.length);
 
       jwt.verify(token, jwtSecretKey, (err, payload) => {
         if (err) {
-          console.log("Not authorized");
+          logger.error("Not authorized");
           res.status(401).json({
-            error: "Not authorized",
-            datetime: new Date().toISOString(),
+            statusCode: 401,
+            message: "Not authorized",
           });
         }
         if (payload) {
-          console.log("token is valid", payload);
+          logger.debug("token is valid", payload);
           // User heeft toegang. Voeg UserId uit payload toe aan
           // request, voor ieder volgend endpoint.
           req.userId = payload.userid;
-          console.log("userId = ", payload.userid);
+          logger.info("userId = ", payload.userid);
           next();
         }
       });
