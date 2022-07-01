@@ -17,17 +17,11 @@ let controller = {
       assert(typeof street === "string", "Street must be a string.");
       assert(typeof city === "string", "City must be a string.");
       //Regex die checkt of het emailaddress twee punten en een apenstaartje bevatten.
-<<<<<<< HEAD
-      assert.match(emailAdress, /.+\@.+\..+/, "This is not an correct email address.");
-      //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
-      assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.");
-=======
       assert.match(emailAdress, /.+\@.+\..+/, "The email address is incorrect.");
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
-      assert.match(password, /([0-9]{8,})/, "The password is to short.");
+      assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.");
       //Regex die checkt of er een geldig telefoonnummer is ingevoerd.
-      assert.match(password, /(([0-9]{8,}))/, "The phonenumber is incorrect.");
->>>>>>> feature-user-controller
+      assert.match(phonenumber, /(([0-9]{8,}))/, "The phonenumber is incorrect.");
 
       next();
     } catch (err) {
@@ -46,14 +40,14 @@ let controller = {
 
     let user = req.body;
     logger.debug(user);
-    let {firstName, lastName, emailAdress, password, street, city } = user;
+    let {firstName, lastName, emailAdress, password, phonenumber, street, city } = user;
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
       connection.query(
         `INSERT INTO user (firstName, lastName, emailAdress, password, street, city) VALUES(?,?,?,?,?,?);`,
-        [firstName, lastName, emailAdress, password, street, city],
+        [firstName, lastName, emailAdress, password, phonenumber, street, city],
         function (error, results, fields) {
 
           if (error) {
@@ -181,7 +175,7 @@ let controller = {
 
     const userId = req.params.userId;
     let user = req.body;
-    let { firstName, lastName, emailAdress, password, street, city } = user;
+    let { firstName, lastName, emailAdress, password, phonenumber, street, city } = user;
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -193,7 +187,7 @@ let controller = {
           if (results.length > 0) {
             connection.query(
               `UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, street = ?, city = ? WHERE id = ${userId}`,
-              [firstName, lastName, emailAdress, password, street, city],
+              [firstName, lastName, emailAdress, password, phonenumber, street, city],
               function (error, results, fields) {
                 connection.release();
                 if (error) throw error;
