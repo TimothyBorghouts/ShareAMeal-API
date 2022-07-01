@@ -4,6 +4,8 @@ const logger = require("../config/config").logger;
 
 let controller = {
   validateUser: (req, res, next) => {
+    logger.info("validateUser called");
+
     let user = req.body;
     let { firstName, lastName, emailAdress, password, street, city } = user;
 
@@ -28,6 +30,8 @@ let controller = {
 
   //UC-201 - Toevoegen van een gebruiker.
   addUser: (req, res, next) => {
+    logger.info("addUser called");
+
     let user = req.body;
     logger.debug(user);
     let {firstName, lastName, emailAdress, password, street, city } = user;
@@ -47,7 +51,7 @@ let controller = {
             res.status(409).json({
               status: 409,
               message:
-                "Gebruiker met emailaddress " + emailAdress + " bestaat al.",
+                "User with email: " + emailAdress + " does already exist.",
             });
           } else {
             connection.query(
@@ -72,6 +76,8 @@ let controller = {
 
   //UC-202 - Bekijken van alle gebruikers.
   getAllUsers: (req, res) => {
+    logger.info("getAllUsers called");
+
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(`SELECT * FROM user`, function (error, results, fields) {
@@ -89,6 +95,8 @@ let controller = {
 
   //UC-203 - Het opvragen van een persoonlijk gebruikers profiel.
   getUserProfile: (req, res) => {
+    logger.info("getUserProfile called");
+
     const userId = req.userId;
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -108,7 +116,7 @@ let controller = {
             logger.debug("Found no user with getUserProfile.");
             res.status(404).json({
               status: 404,
-              message: "User with Id " + userId + " not found.",
+              message: "User with Id: " + userId + " doesn't exist.",
             });
           }
         }
@@ -118,6 +126,8 @@ let controller = {
 
   //UC-204 - Een specifieke gebruiker opvragen.
   getUserById: (req, res) => {
+    logger.info("getUserById called");
+
     const userId = req.params.userId;
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -138,7 +148,7 @@ let controller = {
             logger.debug("No user found with getUserById.");
             res.status(404).json({
               status: 404,
-              message: "User with Id " + userId + " not found.",
+              message: "User with Id: " + userId + " doesn't exist.",
             });
           }
         }
@@ -148,6 +158,8 @@ let controller = {
 
   //UC-205 - Verander een specifieke gebruiker.
   updateUserById: (req, res) => {
+    logger.info("updateUserById called");
+
     const userId = req.params.userId;
     let user = req.body;
     let { firstName, lastName, emailAdress, password, street, city } = user;
@@ -179,7 +191,7 @@ let controller = {
             connection.release();
             res.status(400).json({
               status: 400,
-              message: "Gebruiker met Id " + userId + " bestaat niet",
+              message: "User with Id: " + userId + " doesn't exist.",
             });
           }
         }
@@ -189,6 +201,8 @@ let controller = {
 
   //UC-206 - Verwijder een gebruiker.
   deleteUserById: (req, res) => {
+    logger.info("deleteUserById called");
+
     const userId = req.params.userId;
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -207,7 +221,7 @@ let controller = {
                 logger.debug("Deleted user with deleteUserById.");
                 res.status(200).json({
                   status: 200,
-                  result: "Gebuiker is uit de database verwijderd",
+                  message: "User is deleted.",
                 });
               }
             );
@@ -216,7 +230,7 @@ let controller = {
             connection.release();
             res.status(400).json({
               status: 400,
-              result: "Gebruiker met Id " + userId + " bestaat niet",
+              message: "User with id: " + userId + " doesn't exist.",
             });
           }
         }
