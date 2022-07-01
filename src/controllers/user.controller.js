@@ -16,6 +16,7 @@ let controller = {
       assert(typeof password === "string", "Password must be a string.");
       assert(typeof street === "string", "Street must be a string.");
       assert(typeof city === "string", "City must be a string.");
+      assert.match(emailAdress, /.+\@.+\..+/, "This is not an correct email address.")
 
       next();
     } catch (err) {
