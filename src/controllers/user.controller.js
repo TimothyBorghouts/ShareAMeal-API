@@ -61,10 +61,17 @@ let controller = {
 
                 if (error) throw error;
 
+                user = results[0];
+                if(user.isActive){
+                  user.isActive = true;
+                }else {
+                  user.isActive = false;
+                }
+
                 logger.debug("Added user to database with addUser.");
                 res.status(201).json({
                   status: 201,
-                  result: results[0],
+                  result: user,
                 });
 
               });
