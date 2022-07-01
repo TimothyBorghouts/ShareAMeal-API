@@ -78,10 +78,10 @@ let controller = {
     });
   },
 
-  //Check if an email and password is given as a string before login.
   validateLogin(req, res, next) {
     logger.info("ValidateLogin called");
 
+    //Checkt of email en wachtwoord een string zijn
     try {
       assert(
         typeof req.body.emailAdress === "string",
@@ -91,10 +91,16 @@ let controller = {
         typeof req.body.password === "string",
         "password must be a string."
       );
+
+      //Regex die checkt of het emailaddress twee punten en een apenstaartje bevatten.
+      assert.match(emailAdress, /.+\@.+\..+/, "This is not an correct email address.");
+      //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
+      assert.match(password, /([0-9a-zA-Z]{8,})/, "This is not an correct password.");
+
       next();
     } catch (err) {
-      res.status(422).json({
-        statusCode: 422,
+      res.status(400).json({
+        statusCode: 400,
         message: err.toString(),
       });
     }
