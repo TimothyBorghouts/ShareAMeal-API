@@ -21,7 +21,7 @@ let controller = {
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.");
       //Regex die checkt of er een geldig telefoonnummer is ingevoerd.
-      assert.match(phonenumber, /([0-9]{2,})/, "The phonenumber is incorrect.");
+      // assert.match(phonenumber, /([0-9]{2,})/, "The phonenumber is incorrect.");
 
       next();
     } catch (err) {
