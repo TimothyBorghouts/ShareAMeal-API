@@ -14,21 +14,21 @@ router.get("/api/user", userController.getAllUsers);
 //UC-203 - Het opvragen van een persoonlijk gebruikers profiel.
 router.get(
   "/api/user/profile",
-  // authController.validateToken,
+  authController.validateToken,
   userController.getUserProfile
 );
 
 //UC-204 - Een specifieke gebruiker opvragen.
 router.get(
   "/api/user/:userId",
-  // authController.validateToken,
+  authController.validateToken,
   userController.getUserById
 );
 
 //UC-205 - Verander een specifieke gebruiker.
 router.put(
   "/api/user/:userId",
-    // authController.validateToken,
+    authController.validateToken,
     userController.validateUser,
   userController.updateUserById
 );
@@ -36,7 +36,7 @@ router.put(
 //UC-206 - Verwijder specifieke een gebruiker.
 router.delete(
   "/api/user/:userId",
-  // authController.validateToken,
+  authController.validateToken,
   userController.deleteUserById
 );
 

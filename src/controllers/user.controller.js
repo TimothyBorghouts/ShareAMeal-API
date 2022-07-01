@@ -7,7 +7,7 @@ let controller = {
     logger.info("validateUser called");
 
     let user = req.body;
-    let { firstName, lastName, emailAdress, password, street, city } = user;
+    let { firstName, lastName, emailAdress, password, phonenumber, street, city } = user;
 
     try {
       assert(typeof firstName === "string", "Firstname must be a string.");
@@ -17,9 +17,11 @@ let controller = {
       assert(typeof street === "string", "Street must be a string.");
       assert(typeof city === "string", "City must be a string.");
       //Regex die checkt of het emailaddress twee punten en een apenstaartje bevatten.
-      assert.match(emailAdress, /.+\@.+\..+/, "The is not an correct email address.")
+      assert.match(emailAdress, /.+\@.+\..+/, "The email address is incorrect.");
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
-      assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.")
+      assert.match(password, /([0-9]{8,})/, "The password is to short.");
+      //Regex die checkt of er een geldig telefoonnummer is ingevoerd.
+      assert.match(password, /(([0-9]{8,}))/, "The phonenumber is incorrect.");
 
       next();
     } catch (err) {
