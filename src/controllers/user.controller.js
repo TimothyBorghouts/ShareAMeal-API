@@ -29,14 +29,17 @@ let controller = {
   //UC-201 - Toevoegen van een gebruiker.
   addUser: (req, res, next) => {
     let user = req.body;
-    let { firstName, lastName, emailAdress, password, street, city } = user;
+    logger.debug(user);
+    let {firstName, lastName, emailAdress, password, street, city } = user;
+
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
+
       connection.query(
         `INSERT INTO user (firstName, lastName, emailAdress, password, street, city) VALUES(?,?,?,?,?,?);`,
         [firstName, lastName, emailAdress, password, street, city],
         function (error, results, fields) {
-          connection.release();
+
           if (error) {
             logger.debug(
               "Could not add user to database, email alreadt exists."
@@ -47,11 +50,20 @@ let controller = {
                 "Gebruiker met emailaddress " + emailAdress + " bestaat al.",
             });
           } else {
-            logger.debug("Added user to database with addUser.");
-            res.status(201).json({
-              status: 201,
-              result: user,
-            });
+            connection.query(
+              `SELECT * FROM user WHERE emailAdress = '${user.emailAdress}'`,
+              function (error, results, fields) {
+                connection.release();
+
+                if (error) throw error;
+
+                logger.debug("Added user to database with addUser.");
+                res.status(201).json({
+                  status: 201,
+                  result: results[0],
+                });
+
+              });
           }
         }
       );
