@@ -24,21 +24,18 @@ let controller = {
       if (connection) {
         logger.info("Database connected!");
 
-        //---------------------------------------------------------------------------------------//
         //Check if the given user exists.
-
         connection.query(
-          `SELECT * FROM user where emailAdress =`,
-          [req.body.emailAdress],
+          `SELECT * FROM user where emailAdress =` + [req.body.emailAdress],
           function (error, results, fields) {
             connection.release();
-            if (error) throw error;
-
-            logger.debug("Couldn't found a user with that emailaddress.");
-            res.status(404).json({
-              statusCode: 404,
-              message: "Couldn't found a user with that emailaddress.",
-            });
+            if (err) {
+              logger.debug("User does not exist");
+              res.status(404).json({
+                statusCode: 404,
+                message: "User does not exist.",
+              });
+            }
           }
         );
 
@@ -90,7 +87,6 @@ let controller = {
             }
           }
         );
-        //---------------------------------------------------------------------------------------------------//
 
         //dbconnection is not connected
       } else {
