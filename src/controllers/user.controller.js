@@ -116,7 +116,7 @@ let controller = {
             logger.debug("Found no user with getUserProfile.");
             res.status(404).json({
               status: 404,
-              message: "User with Id: " + userId + " doesn't exist.",
+              message: "User with Id: " + userId + " does not exist",
             });
           }
         }
@@ -148,7 +148,7 @@ let controller = {
             logger.debug("No user found with getUserById.");
             res.status(404).json({
               status: 404,
-              message: "User with Id: " + userId + " doesn't exist.",
+              message: "User with Id: " + userId + " does not exist",
             });
           }
         }
@@ -191,7 +191,7 @@ let controller = {
             connection.release();
             res.status(400).json({
               status: 400,
-              message: "User with Id: " + userId + " doesn't exist.",
+              message: "User with Id: " + userId + " does not exist",
             });
           }
         }
@@ -230,7 +230,7 @@ let controller = {
             connection.release();
             res.status(400).json({
               status: 400,
-              message: "User with id: " + userId + " doesn't exist.",
+              message: "User does not exist",
             });
           }
         }
