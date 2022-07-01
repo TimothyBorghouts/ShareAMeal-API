@@ -13,65 +13,86 @@ let controller = {
 
     dbconnection.getConnection((err, connection) => {
       if (err) {
-        logger.error('No connection from dbconnection.');
+        logger.error("No connection from dbconnection.");
         res.status(500).json({
           statusCode: 500,
           message: err.toString(),
-        })
+        });
       }
 
       //dbconnection is succesfully connected
       if (connection) {
-      logger.info("Database connected!");
+        logger.info("Database connected!");
 
-          //---------------------------------------------------------------------------------------//
-          connection.query(
-            queryString,
-            [req.body.emailAdress],
-            (error, rows, fields) => {
-              connection.release();
+        //---------------------------------------------------------------------------------------//
+        //Check if the given user exists.
 
-              if (err) {
-                logger.error('Error: ' , err.toString());
-                res.status(500).json({
-                  statusCode: 500,
-                  message: err.toString(),
-                })
-              }
+        connection.query(
+          `SELECT * FROM user where emailAdress =`,
+          [req.body.emailAdress],
+          function (error, results, fields) {
+            connection.release();
+            if (error) throw error;
 
-              //Kijken of het paswoord bestaat en of er wel een password is ingevoerd.
-              if (rows && rows.length === 1 && rows[0].password == req.body.password) {
-                logger.info("password is correct.");
+            logger.debug("Couldn't found a user with that emailaddress.");
+            res.status(404).json({
+              statusCode: 404,
+              message: "Couldn't found a user with that emailaddress.",
+            });
+          }
+        );
 
-                const user = rows[0];
+        connection.query(
+          queryString,
+          [req.body.emailAdress],
+          (error, rows, fields) => {
+            connection.release();
 
-                //email en wachtwoord zijn correct dus we geven het token terug.
-                jwt.sign(
-                  { userid: user.id },
-                  jwtSecretKey,
-                  { expiresIn: "30d" },
-                  function (err, token) {
-                    logger.info(token);
-                    res.status(200).json({
-                      statusCode: 200,
-                      message: token,
-                    });
-                  }
-                );
+            if (err) {
+              logger.error("Error: ", err.toString());
+              res.status(500).json({
+                statusCode: 500,
+                message: err.toString(),
+              });
+            }
+
+            //Kijken of het paswoord bestaat en of er wel een password is ingevoerd.
+            if (
+              rows &&
+              rows.length === 1 &&
+              rows[0].password == req.body.password
+            ) {
+              logger.info("password is correct.");
+
+              const user = rows[0];
+
+              //email en wachtwoord zijn correct dus we geven het token terug.
+              jwt.sign(
+                { userid: user.id },
+                jwtSecretKey,
+                { expiresIn: "30d" },
+                function (err, token) {
+                  logger.info(token);
+                  res.status(200).json({
+                    statusCode: 200,
+                    message: token,
+                  });
+                }
+              );
 
               //email en wachtwoord zijn incorrect dus we geven een error terug.
-              } else {
-                logger.debug("user not found or password incorrect");
-                res.status(401).json({
-                  statusCode: 401,
-                  message: "email or password incorrect",
-                });
-              }
+            } else {
+              logger.debug("user not found or password incorrect");
+              res.status(401).json({
+                statusCode: 401,
+                message: "email or password incorrect",
+              });
             }
-          );
-          //---------------------------------------------------------------------------------------------------//
+          }
+        );
+        //---------------------------------------------------------------------------------------------------//
 
-      //dbconnection is not connected
+        //dbconnection is not connected
       } else {
         logger.info("No connection!");
       }
@@ -93,9 +114,17 @@ let controller = {
       );
 
       //Regex die checkt of het emailaddress twee punten en een apenstaartje bevatten.
-      assert.match(emailAdress, /.+\@.+\..+/, "This is not an correct email address.");
+      assert.match(
+        emailAdress,
+        /.+\@.+\..+/,
+        "This is not an correct email address."
+      );
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
-      assert.match(password, /([0-9a-zA-Z]{8,})/, "This is not an correct password.");
+      assert.match(
+        password,
+        /([0-9a-zA-Z]{8,})/,
+        "This is not an correct password."
+      );
 
       next();
     } catch (err) {
