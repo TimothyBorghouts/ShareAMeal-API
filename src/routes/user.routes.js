@@ -5,7 +5,7 @@ const userController = require("../controllers/user.controller");
 
 //UC-201 - Toevoegen van een gebruiker.
 router.post("/api/user", 
-// userController.validateUser, 
+userController.validateUser,
 userController.addUser);
 
 //UC-202 - Bekijken van alle gebruikers.
@@ -29,7 +29,7 @@ router.get(
 router.put(
   "/api/user/:userId",
     // authController.validateToken,
-    // userController.validateUser,
+    userController.validateUser,
   userController.updateUserById
 );
 
