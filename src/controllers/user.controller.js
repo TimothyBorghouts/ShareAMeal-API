@@ -12,7 +12,7 @@ let controller = {
       lastName,
       emailAdress,
       password,
-      phonenumber,
+      phoneNumber,
       street,
       city,
     } = user;
@@ -33,7 +33,7 @@ let controller = {
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.");
       //Regex die checkt of er een geldig telefoonnummer is ingevoerd.
-      // assert.match(phonenumber, /([0-9]{2,})/, "The phonenumber is incorrect.");
+      assert.match(phoneNumber, /([0-9]{2,})/, "The phonenumber is incorrect.");
 
       next();
     } catch (err) {
@@ -57,7 +57,7 @@ let controller = {
       lastName,
       emailAdress,
       password,
-      phonenumber,
+      phoneNumber,
       street,
       city,
     } = user;
@@ -66,8 +66,8 @@ let controller = {
       if (err) throw err;
 
       connection.query(
-        `INSERT INTO user (firstName, lastName, emailAdress, password, phonenumber, street, city) VALUES(?,?,?,?,?,?);`,
-        [firstName, lastName, emailAdress, password, phonenumber, street, city],
+        `INSERT INTO user (firstName, lastName, emailAdress, password, phoneNumber, street, city) VALUES(?,?,?,?,?,?,?);`,
+        [firstName, lastName, emailAdress, password, phoneNumber, street, city],
         function (err, results, fields) {
           if (err) {
             connection.release();
@@ -216,15 +216,7 @@ let controller = {
           if (results.length > 0) {
             connection.query(
               `UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, street = ?, city = ? WHERE id = ${userId}`,
-              [
-                firstName,
-                lastName,
-                emailAdress,
-                password,
-                phonenumber,
-                street,
-                city,
-              ],
+              [firstName, lastName, emailAdress, password, street, city],
               function (error, results, fields) {
                 connection.release();
                 if (error) throw error;
