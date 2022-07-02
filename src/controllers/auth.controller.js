@@ -49,6 +49,7 @@ let controller = {
               logger.info("password is correct.");
 
               const user = rows[0];
+              const { password, ...userinfo } = rows[0];
 
               //email en wachtwoord zijn correct dus we geven het token terug.
               jwt.sign(
@@ -59,7 +60,7 @@ let controller = {
                   logger.info(token);
                   res.status(200).json({
                     statusCode: 200,
-                    result: { ...userInfo, token },
+                    result: { ...userinfo, token },
                   });
                 }
               );
