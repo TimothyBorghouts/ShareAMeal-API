@@ -24,32 +24,18 @@ let controller = {
       if (connection) {
         logger.info("Database connected!");
 
-        //Check if the given user exists.
         connection.query(
-          `SELECT * FROM user where emailAdress =` + [req.body.emailAdress],
-          function (error, results, fields) {
+          queryString,
+          [req.body.emailAdress],
+          (err, rows, fields) => {
+            connection.release();
+            //User with that emailAdress does not exist.
             if (err) {
               connection.release();
               logger.debug("User does not exist");
               res.status(404).json({
                 statusCode: 404,
                 message: "User does not exist.",
-              });
-            }
-          }
-        );
-
-        connection.query(
-          queryString,
-          [req.body.emailAdress],
-          (error, rows, fields) => {
-            connection.release();
-
-            if (err) {
-              logger.error("Error: ", err.toString());
-              res.status(500).json({
-                statusCode: 500,
-                message: err.toString(),
               });
             }
 
@@ -72,17 +58,17 @@ let controller = {
                   logger.info(token);
                   res.status(200).json({
                     statusCode: 200,
-                    message: token,
+                    result: token,
                   });
                 }
               );
 
               //email en wachtwoord zijn incorrect dus we geven een error terug.
             } else {
-              logger.debug("user not found or password incorrect");
-              res.status(401).json({
-                statusCode: 401,
-                message: "email or password incorrect",
+              logger.debug("Email or password is incorrect or does not exist.");
+              res.status(404).json({
+                statusCode: 404,
+                message: "Email or password is incorrect or does not exist.",
               });
             }
           }
