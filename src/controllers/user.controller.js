@@ -32,10 +32,10 @@ let controller = {
       );
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.");
-      //Regex die checkt of er een telefoonnummer is ingevoerd met eerst 2 of meer cijfers, een streepje en dan weer twee of meer cijfers.
+      //Regex die checkt of er een telefoonnummer is ingevoerd met misschien een + dan 2 of meer cijfers, een streepje en ergens ook meerdere cijfers.
       assert.match(
         phoneNumber,
-        /([0-9]{2,}-[0-9]{2,})/,
+        /^+?([0-9]{2}|-?[0-9]{4,})/,
         "The phonenumber is incorrect."
       );
 
