@@ -35,7 +35,7 @@ let controller = {
       //Regex die checkt of er een telefoonnummer is ingevoerd met misschien een + dan 2 of meer cijfers, een streepje en ergens ook meerdere cijfers.
       assert.match(
         phoneNumber,
-        /^+?([0-9]{2}|-?[0-9]{4,})/,
+        /([0-9]{2}-?[0-9]{4,})/,
         "The phonenumber is incorrect."
       );
 
