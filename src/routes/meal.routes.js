@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const authController = require("../controllers/auth.controller");
 const mealController = require("../controllers/meal.controller");
 
 //UC-301 - Toevoegen van een maaltijd.
