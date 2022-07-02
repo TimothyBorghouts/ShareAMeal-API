@@ -28,8 +28,8 @@ let controller = {
         connection.query(
           `SELECT * FROM user where emailAdress =` + [req.body.emailAdress],
           function (error, results, fields) {
-            connection.release();
             if (err) {
+              connection.release();
               logger.debug("User does not exist");
               res.status(404).json({
                 statusCode: 404,
@@ -98,12 +98,14 @@ let controller = {
   validateLogin(req, res, next) {
     logger.info("ValidateLogin called");
 
-    //Checkt of email en wachtwoord een string zijn
+    //Checkt of de email een string is.
     try {
       assert(
         typeof req.body.emailAdress === "string",
         "email must be a string."
       );
+
+      //Checkt of het wachtwoord een string is.
       assert(
         typeof req.body.password === "string",
         "password must be a string."
@@ -115,6 +117,7 @@ let controller = {
         /.+\@.+\..+/,
         "This is not an correct email address."
       );
+
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(
         req.body.password,
