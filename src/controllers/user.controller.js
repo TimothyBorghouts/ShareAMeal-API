@@ -128,8 +128,7 @@ let controller = {
 
     let inputForQuery = req.query;
     logger.debug(inputForQuery);
-    let firstName = inputForQuery.firstName;
-    let isActive = inputForQuery.isActive;
+    let { firstName, isActive } = req.query;
 
     //Als er isActive en firstName is gegeven.
     if (isActive != undefined && firstName != undefined) {
@@ -165,7 +164,7 @@ let controller = {
   },
 
   //UC-203 - Het opvragen van een persoonlijk gebruikers profiel.
-  getUserProfile: (req, res) => {
+  getUserProfile: (req, res, next) => {
     logger.info("getUserProfile called");
 
     const userId = req.userId;
@@ -173,15 +172,13 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        `SELECT * FROM user WHERE id = ?;`,
+        "SELECT * FROM user WHERE id = ?;",
         [userId],
         function (error, results, fields) {
-          if (error) throw error;
           connection.release();
 
-          logger.debug("Found a user with getUserProfile.");
           res.status(200).json({
-            statusCode: 200,
+            status: 200,
             result: results[0],
           });
         }
