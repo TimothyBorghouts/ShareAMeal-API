@@ -133,24 +133,29 @@ let controller = {
     //Als er geen isActive en geen firstName is gegeven.
     let queryString = `SELECT * FROM user;`;
 
-    //Als er geen isActive maar wel firstName is gegeven.
-    if (isActive != undefined && firstName == undefined) {
+    //Als er isActive en firstName is gegeven.
+    if (isActive != undefined && firstName != undefined) {
+      queryString = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive};`;
+      //
+      //Als er geen isActive maar wel firstName is gegeven.
+    } else if (isActive != undefined && firstName == undefined) {
       queryString = `SELECT * FROM user WHERE isActive = ${isActive};`;
       //
       //Als er wel isActive maar geen firstName is gegeven.
     } else if (isActive == undefined && firstName != undefined) {
       queryString = `SELECT * FROM user WHERE firstName = ${firstName};`;
-      //
-      //Als er isActive en firstName is gegeven.
-    } else if (isActive != undefined && firstName != undefined) {
-      queryString = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive};`;
     }
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(queryString, function (error, results, fields) {
         connection.release();
-        if (error) throw error;
+        if (error) {
+          res.status(404).json({
+            status: 404,
+            message: "Could not found users.",
+          });
+        }
 
         logger.debug("Found all the users with getAllUsers.");
         res.status(200).json({
