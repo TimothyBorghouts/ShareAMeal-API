@@ -4,7 +4,7 @@ const dbconnection = require("../../database/dbconnection");
 const logger = require("../config/config").logger;
 const jwtSecretKey = require("../config/config").jwtSecretKey;
 
-const queryString = `SELECT id, firstName, emailAdress, password FROM user WHERE emailAdress = ?`;
+const queryString = `SELECT id, firstName, lastName, emailAdress, password FROM user WHERE emailAdress = ?`;
 
 let controller = {
   //User uses emaal and password to receive a token.
