@@ -126,15 +126,35 @@ let controller = {
   getAllUsers: (req, res) => {
     logger.info("getAllUsers called");
 
+    let input = req.input;
+    const firstName = input.firstName;
+    const isActive = input.isActive;
+
+    //Als er geen isActive en geen firstName is gegeven.
+    let query = `SELECT * FROM user`;
+
+    //Als er geen isActive maar wel firstName is gegeven.
+    if (isActive != undefined && firstName == undefined) {
+      query = `SELECT * FROM user WHERE isActive = ${isActive}`;
+      //
+      //Als er wel isActive maar geen firstName is gegeven.
+    } else if (isActive == undefined && firstName != undefined) {
+      query = `SELECT * FROM user WHERE firstName = ${firstName}`;
+      //
+      //Als er isActive en firstName is gegeven.
+    } else {
+      query = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive}`;
+    }
+
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      connection.query(`SELECT * FROM user`, function (error, results, fields) {
+      connection.query(query, function (error, results, fields) {
         connection.release();
         if (error) throw error;
 
         logger.debug("Found all the users with getAllUsers.");
-        res.status(202).json({
-          statusCode: 202,
+        res.status(200).json({
+          statusCode: 200,
           results: results,
         });
       });
@@ -152,9 +172,9 @@ let controller = {
       connection.query(
         `SELECT * FROM user WHERE id = ?`,
         [userId],
-        function (err, results, fields) {
+        function (error, results, fields) {
           connection.release();
-          if (err) throw err;
+          if (error) throw error;
 
           if (!results.length == 0) {
             logger.debug("Found a user with getUserProfile.");
