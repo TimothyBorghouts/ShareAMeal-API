@@ -225,7 +225,7 @@ let controller = {
       if (err) throw err;
 
       connection.query(
-        `SELECT * FROM meal WHERE id = ?`,
+        `SELECT * FROM meal WHERE id = ?;`,
         [mealId],
         function (error, results, fields) {
           connection.release();
@@ -251,7 +251,7 @@ let controller = {
 
             res.status(200).json({
               status: 200,
-              result: results[0],
+              result: meal,
             });
           }
         }
