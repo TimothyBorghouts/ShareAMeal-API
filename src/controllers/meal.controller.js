@@ -83,55 +83,55 @@ let controller = {
           meal.description,
           allergenes,
         ],
-        function (err, results, fields) {
-          if (err) {
-            connection.release();
-            logger.debug("Could not add meal to database.");
+        function (error, results, fields) {
+          // if (error) {
+          //   connection.release();
+          //   logger.debug("Could not add meal to database.");
 
-            res.status(409).json({
-              status: 409,
-              message: "Meal could not be added to database",
-            });
-          } else {
-            connection.query(
-              `SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`,
-              function (error, results, fields) {
-                connection.release();
+          //   res.status(409).json({
+          //     status: 409,
+          //     message: "Meal could not be added to database",
+          //   });
+          // } else {
+          connection.query(
+            `SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`,
+            function (error, results, fields) {
+              connection.release();
 
-                // meal = results[0];
+              // meal = results[0];
 
-                // if (meal.isActive) {
-                //   meal.isActive = true;
-                // } else {
-                //   meal.isActive = false;
-                // }
+              // if (meal.isActive) {
+              //   meal.isActive = true;
+              // } else {
+              //   meal.isActive = false;
+              // }
 
-                // if (meal.isVega) {
-                //   meal.isVega = true;
-                // } else {
-                //   meal.isVega = false;
-                // }
+              // if (meal.isVega) {
+              //   meal.isVega = true;
+              // } else {
+              //   meal.isVega = false;
+              // }
 
-                // if (meal.isVegan) {
-                //   meal.isVegan = true;
-                // } else {
-                //   meal.isVegan = false;
-                // }
+              // if (meal.isVegan) {
+              //   meal.isVegan = true;
+              // } else {
+              //   meal.isVegan = false;
+              // }
 
-                // if (meal.isToTakeHome) {
-                //   meal.isToTakeHome = true;
-                // } else {
-                //   meal.isToTakeHome = false;
-                // }
+              // if (meal.isToTakeHome) {
+              //   meal.isToTakeHome = true;
+              // } else {
+              //   meal.isToTakeHome = false;
+              // }
 
-                logger.debug("Added meal to database.");
-                res.status(201).json({
-                  status: 201,
-                  result: results[0],
-                });
-              }
-            );
-          }
+              logger.debug("Added meal to database.");
+              res.status(201).json({
+                status: 201,
+                result: results[0],
+              });
+            }
+          );
+          // }
         }
       );
     });
