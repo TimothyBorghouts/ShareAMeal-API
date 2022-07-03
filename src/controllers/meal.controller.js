@@ -44,13 +44,17 @@ let controller = {
     logger.info("addMeal called");
 
     let meal = req.body;
+    let cookId = req.userId;
+
+    let allergenes = meal.allergenes.join();
+
     logger.debug(meal);
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
       connection.query(
-        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, name, description) VALUES(?,?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description, allergenes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);`,
         [
           meal.isActive,
           meal.isVega,
@@ -60,8 +64,10 @@ let controller = {
           meal.maxAmountOfParticipants,
           meal.price,
           meal.imageUrl,
+          cookId,
           meal.name,
           meal.description,
+          allergenes,
         ],
         function (err, results, fields) {
           if (err) {
@@ -74,7 +80,8 @@ let controller = {
             });
           } else {
             connection.query(
-              `SELECT * FROM meal WHERE name = '${meal.name}'`,
+              `SELECT * FROM meal WHERE name = ?`,
+              [meal.name],
               function (error, results, fields) {
                 connection.release();
 
