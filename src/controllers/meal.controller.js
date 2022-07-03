@@ -90,38 +90,35 @@ let controller = {
             });
           } else {
             connection.query(
-              `SELECT * FROM meal WHERE name = ?`,
-              [meal.name],
+              `SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`,
               function (error, results, fields) {
                 connection.release();
 
-                meal = results[0];
+                // meal = results[0];
 
-                if (meal.isActive) {
-                  meal.isActive = true;
-                } else {
-                  meal.isActive = false;
-                }
+                // if (meal.isActive) {
+                //   meal.isActive = true;
+                // } else {
+                //   meal.isActive = false;
+                // }
 
-                if (meal.isVega) {
-                  meal.isVega = true;
-                } else {
-                  meal.isVega = false;
-                }
+                // if (meal.isVega) {
+                //   meal.isVega = true;
+                // } else {
+                //   meal.isVega = false;
+                // }
 
-                if (meal.isVegan) {
-                  meal.isVegan = true;
-                } else {
-                  meal.isVegan = false;
-                }
+                // if (meal.isVegan) {
+                //   meal.isVegan = true;
+                // } else {
+                //   meal.isVegan = false;
+                // }
 
-                if (meal.isToTakeHome) {
-                  meal.isToTakeHome = true;
-                } else {
-                  meal.isToTakeHome = false;
-                }
-
-                if (error) throw error;
+                // if (meal.isToTakeHome) {
+                //   meal.isToTakeHome = true;
+                // } else {
+                //   meal.isToTakeHome = false;
+                // }
 
                 logger.debug("Added meal to database.");
                 res.status(201).json({
