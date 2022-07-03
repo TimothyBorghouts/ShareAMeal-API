@@ -72,7 +72,6 @@ let controller = {
           connection.query(
             `SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`,
             function (error, results, fields) {
-              if (error) throw error;
               connection.release();
 
               // meal = results[0];
