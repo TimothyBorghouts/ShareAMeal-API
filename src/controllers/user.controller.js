@@ -16,6 +16,7 @@ let controller = {
       assert(typeof password === "string", "Password must be a string.");
       assert(typeof street === "string", "Street must be a string.");
       assert(typeof city === "string", "City must be a string.");
+
       //Regex die checkt of het emailaddress twee punten en een apenstaartje bevatten.
       assert.match(
         emailAdress,
@@ -91,7 +92,7 @@ let controller = {
             res.status(409).json({
               status: 409,
               message:
-                "User with email: " + emailAdress + " does already exist.",
+                "User with email: " + user.emailAdress + " does already exist.",
             });
           } else {
             connection.query(
@@ -152,7 +153,7 @@ let controller = {
 
         logger.debug("Found all the users with getAllUsers.");
         res.status(200).json({
-          statusCode: 200,
+          status: 200,
           results: results,
         });
       });
@@ -168,14 +169,15 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        `SELECT * FROM user WHERE id = ?`,
+        `SELECT * FROM user WHERE id = ?;`,
         [userId],
         function (error, results, fields) {
+          if (error) throw error;
           connection.release();
 
           logger.debug("Found a user with getUserProfile.");
           res.status(200).json({
-            status: 200,
+            statusCode: 200,
             result: results[0],
           });
         }
@@ -197,17 +199,17 @@ let controller = {
           connection.release();
           if (error) throw error;
 
-          if (results.length > 0) {
-            logger.debug("Found specific user with getUserById.");
-            res.status(200).json({
-              status: 200,
-              result: results[0],
-            });
-          } else {
+          if (results.length == 0) {
             logger.debug("No user found with getUserById.");
             res.status(404).json({
               status: 404,
               message: "User with Id: " + userId + " does not exist",
+            });
+          } else {
+            logger.debug("Found specific user with getUserById.");
+            res.status(200).json({
+              status: 200,
+              result: results[0],
             });
           }
         }

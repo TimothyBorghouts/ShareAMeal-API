@@ -15,7 +15,7 @@ let controller = {
       if (err) {
         logger.error("No connection from dbconnection.");
         res.status(500).json({
-          statusCode: 500,
+          status: 500,
           message: err.toString(),
         });
       }
@@ -34,7 +34,7 @@ let controller = {
               connection.release();
               logger.debug("User does not exist");
               res.status(404).json({
-                statusCode: 404,
+                status: 404,
                 message: "User does not exist.",
               });
             }
@@ -67,7 +67,7 @@ let controller = {
                 function (err, token) {
                   logger.info(token);
                   res.status(200).json({
-                    statusCode: 200,
+                    status: 200,
                     result: { ...userinfo, token },
                   });
                 }
@@ -77,7 +77,7 @@ let controller = {
             } else {
               logger.debug("Email or password is incorrect or does not exist.");
               res.status(404).json({
-                statusCode: 404,
+                status: 404,
                 message: "Email or password is incorrect or does not exist.",
               });
             }
@@ -125,7 +125,7 @@ let controller = {
       next();
     } catch (err) {
       res.status(400).json({
-        statusCode: 400,
+        status: 400,
         message: err.toString(),
       });
     }
@@ -139,7 +139,7 @@ let controller = {
     if (!authHeader) {
       logger.error("no authorization header!");
       res.status(401).json({
-        statusCode: "401",
+        status: "401",
         message: "No authorization header",
       });
     } else {
@@ -149,7 +149,7 @@ let controller = {
         if (err) {
           logger.error("Not authorized");
           res.status(401).json({
-            statusCode: 401,
+            status: 401,
             message: "Not authorized",
           });
         }

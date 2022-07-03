@@ -182,16 +182,19 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
-      connection.query(`SELECT * FROM meal`, function (error, results, fields) {
-        connection.release();
-        if (error) throw error;
+      connection.query(
+        `SELECT * FROM meal;`,
+        function (error, results, fields) {
+          connection.release();
+          if (error) throw error;
 
-        logger.debug("Found all the meals with getAllMeals.");
-        res.status(200).json({
-          statusCode: 200,
-          results: results,
-        });
-      });
+          logger.debug("Found all the meals with getAllMeals.");
+          res.status(200).json({
+            status: 200,
+            results: results,
+          });
+        }
+      );
     });
   },
 
@@ -205,13 +208,19 @@ let controller = {
       if (err) throw err;
 
       connection.query(
-        `SELECT * FROM meal Where id = ?`,
+        `SELECT * FROM meal WHERE id = ?`,
         [mealId],
         function (error, results, fields) {
           connection.release();
           if (error) throw error;
 
-          if (results.length > 0) {
+          if (results.length == 0) {
+            logger.debug("No user found with getMealById.");
+            res.status(404).json({
+              status: 404,
+              result: "Maaltijd met Id " + mealId + " bestaat niet",
+            });
+          } else {
             logger.debug("Found specific meal with getMealById.");
 
             meal = results[0];
@@ -227,12 +236,6 @@ let controller = {
               status: 200,
               result: results[0],
             });
-          } else {
-            logger.debug("No user found with getMealById.");
-            res.status(404).json({
-              status: 404,
-              result: "Maaltijd met Id " + mealId + " bestaat niet",
-            });
           }
         }
       );
@@ -244,14 +247,23 @@ let controller = {
     logger.info("deleteMealById called");
 
     const userId = req.params.userId;
+
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        "SELECT * FROM user Where id = " + userId,
+        "SELECT * FROM user Where id = ",
+        [userId],
         function (error, results, fields) {
           if (error) throw error;
 
-          if (results.length > 0) {
+          if (results.length == 0) {
+            logger.debug("Meal was not found with deleteMealById.");
+            connection.release();
+            res.status(400).json({
+              status: 400,
+              result: "Maaltijd met Id " + mealId + " bestaat niet",
+            });
+          } else {
             connection.query(
               "DELETE FROM user Where id = " + userId,
               function (error, results, fields) {
@@ -265,13 +277,6 @@ let controller = {
                 });
               }
             );
-          } else {
-            logger.debug("Meal was not found with deleteMealById.");
-            connection.release();
-            res.status(400).json({
-              status: 400,
-              result: "Maaltijd met Id " + mealId + " bestaat niet",
-            });
           }
         }
       );
