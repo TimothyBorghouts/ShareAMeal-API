@@ -41,6 +41,8 @@ let controller = {
 
   //UC-301 - Toevoegen van een maaltijd.
   addMeal: (req, res) => {
+    logger.info("addMeal called");
+
     let meal = req.body;
     let {
       name,
@@ -59,7 +61,7 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        `INSERT INTO user ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
         [
           isActive,
           isVega,
