@@ -66,22 +66,21 @@ let controller = {
 
     let user = req.body;
     logger.debug(user);
-    let {
-      firstName,
-      lastName,
-      emailAdress,
-      password,
-      phoneNumber,
-      street,
-      city,
-    } = user;
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
       connection.query(
         `INSERT INTO user (firstName, lastName, emailAdress, password, phoneNumber, street, city) VALUES(?,?,?,?,?,?,?);`,
-        [firstName, lastName, emailAdress, password, phoneNumber, street, city],
+        [
+          user.firstName,
+          user.lastName,
+          user.emailAdress,
+          user.password,
+          user.phoneNumber,
+          user.street,
+          user.city,
+        ],
         function (err, results, fields) {
           if (err) {
             connection.release();
@@ -192,7 +191,7 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        `SELECT * FROM user Where id = ?`,
+        `SELECT * FROM user WHERE id = ?`,
         [userId],
         function (error, results, fields) {
           connection.release();
@@ -235,7 +234,7 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        "SELECT * FROM user Where id = " + userId,
+        "SELECT * FROM user WHERE id = " + userId,
         function (error, results, fields) {
           if (error) throw error;
 
@@ -275,13 +274,13 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        "SELECT * FROM user Where id = " + userId,
+        "SELECT * FROM user WHERE id = " + userId,
         function (error, results, fields) {
           if (error) throw error;
 
           if (results.length > 0) {
             connection.query(
-              "DELETE FROM user Where id = " + userId,
+              "DELETE FROM user WHERE id = " + userId,
               function (error, results, fields) {
                 connection.release();
                 if (error) throw error;

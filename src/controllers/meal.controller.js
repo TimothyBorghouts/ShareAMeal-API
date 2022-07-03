@@ -45,37 +45,23 @@ let controller = {
 
     let meal = req.body;
     logger.debug(meal);
-    let {
-      name,
-      description,
-      isActive,
-      isVega,
-      isVegan,
-      isToTakeHome,
-      dateTime,
-      cookId,
-      imageUrl,
-      maxAmountOfParticipants,
-      price,
-    } = meal;
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
       connection.query(
-        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, name, description) VALUES(?,?,?,?,?,?,?,?,?,?);`,
         [
-          isActive,
-          isVega,
-          isVegan,
-          isToTakeHome,
-          dateTime,
-          maxAmountOfParticipants,
-          price,
-          imageUrl,
-          cookId,
-          name,
-          description,
+          meal.isActive,
+          meal.isVega,
+          meal.isVegan,
+          meal.isToTakeHome,
+          meal.dateTime,
+          meal.maxAmountOfParticipants,
+          meal.price,
+          meal.imageUrl,
+          meal.name,
+          meal.description,
         ],
         function (err, results, fields) {
           if (err) {
@@ -140,47 +126,50 @@ let controller = {
     const mealId = req.params.userId;
     logger.debug(mealId);
     let meal = req.body;
-    let {
-      name,
-      description,
-      price,
-      isActive,
-      isVega,
-      isVegan,
-      isToTakeHome,
-      imageUrl,
-      dateTime,
-    } = meal;
+    logger.debug(meal);
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        "SELECT * FROM user Where id = " + [userId],
+        "SELECT * FROM meal WHERE id = ?;",
+        [mealId],
         function (error, results, fields) {
           if (error) throw error;
 
-          // if (results.length > 0) {
-          //   connection.query(
-          //     `UPDATE meal SET firstName = ?, lastName = ?, isActive = ?, emailAdress = ?, password = ?, phoneNumber = ?, street = ?, city = ? WHERE id = ${mealId}`,
-          //     function (error, results, fields) {
-          //       connection.release();
-          //       if (error) throw error;
+          if (results.length > 0) {
+            connection.query(
+              `UPDATE meal SET isActive = ?, isVega = ?, isVegan = ?, isToTakeHome = ?, dateTime = ?, maxAmountOfParticipants = ?, price = ?, imageUrl = ?, name = ?, description = ? WHERE id = ${mealId}`,
+              [
+                meal.isActive,
+                meal.isVega,
+                meal.isVegan,
+                meal.isToTakeHome,
+                meal.dateTime,
+                meal.maxAmountOfParticipants,
+                meal.price,
+                meal.imageUrl,
+                meal.name,
+                meal.description,
+              ],
+              function (error, results, fields) {
+                connection.release();
+                if (error) throw error;
 
-          //       logger.debug("Updated meal with updateMealById.");
-          //       res.status(200).json({
-          //         status: 200,
-          //         result: meal,
-          //       });
-          //     }
-          //   );
-          // } else {
-          logger.debug("Meal was not found with updateMealById.");
-          connection.release();
-          return res.status(404).json({
-            status: 404,
-            result: "Maaltijd met Id bestaat niet",
-          });
-          // }
+                logger.debug("Updated meal with updateMealById.");
+                res.status(200).json({
+                  status: 200,
+                  result: meal,
+                });
+              }
+            );
+          } else {
+            connection.release();
+            logger.debug("Meal was not found with updateMealById.");
+            return res.status(404).json({
+              status: 404,
+              result: "Maaltijd met Id bestaat niet",
+            });
+          }
         }
       );
     });
