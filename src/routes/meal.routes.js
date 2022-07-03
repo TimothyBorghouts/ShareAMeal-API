@@ -1,18 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const mealController = require("../controllers/meal.controller");
 const authController = require("../controllers/auth.controller");
+const mealController = require("../controllers/meal.controller");
 
 //UC-301 - Toevoegen van een maaltijd.
-router.post(
-  "/api/meal",
-  authController.validateToken,
-  mealController.validateMeal,
-  mealController.addMeal
-);
+router.post("/api/meal", authController.validateToken, mealController.addMeal);
 
 //UC-302 - Bekijken van alle maaltijden.
-router.get("/api/meal", mealController.getAllMeals);
+router.get(
+  "/api/meal",
+  authController.validateToken,
+  mealController.getAllMeals
+);
 
 //UC-303 - Een specifieke maaltijd opvragen.
 router.get(
@@ -25,6 +24,7 @@ router.get(
 router.put(
   "/api/meal/:mealId",
   authController.validateToken,
+  mealController.validateMeal,
   mealController.updateMealById
 );
 
