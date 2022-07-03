@@ -126,25 +126,24 @@ let controller = {
   getAllUsers: (req, res) => {
     logger.info("getAllUsers called");
 
-    // let input = req.input;
-    // const firstName = input.firstName;
-    // const isActive = input.isActive;
+    let input = req.input;
+    let { isActive, firstName } = input;
 
     //Als er geen isActive en geen firstName is gegeven.
     let query = `SELECT * FROM user`;
 
     //Als er geen isActive maar wel firstName is gegeven.
-    // if (isActive != undefined && firstName == undefined) {
-    //   query = `SELECT * FROM user WHERE isActive = ${isActive}`;
-    //   //
-    //   //Als er wel isActive maar geen firstName is gegeven.
-    // } else if (isActive == undefined && firstName != undefined) {
-    //   query = `SELECT * FROM user WHERE firstName = ${firstName}`;
-    //   //
-    //   //Als er isActive en firstName is gegeven.
-    // } else {
-    //   query = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive}`;
-    // }
+    if (isActive != undefined && firstName == undefined) {
+      query = `SELECT * FROM user WHERE isActive = ${isActive}`;
+      //
+      //Als er wel isActive maar geen firstName is gegeven.
+    } else if (isActive == undefined && firstName != undefined) {
+      query = `SELECT * FROM user WHERE firstName = ${firstName}`;
+      //
+      //Als er isActive en firstName is gegeven.
+    } else {
+      query = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive}`;
+    }
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;

@@ -7,7 +7,11 @@ const userController = require("../controllers/user.controller");
 router.post("/api/user", userController.validateUser, userController.addUser);
 
 //UC-202 - Bekijken van alle gebruikers.
-router.get("/api/user", userController.getAllUsers);
+router.get(
+  "/api/user",
+  authController.validateToken,
+  userController.getAllUsers
+);
 
 //UC-203 - Het opvragen van een persoonlijk gebruikers profiel.
 router.get(
