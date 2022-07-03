@@ -126,37 +126,42 @@ let controller = {
   getAllUsers: (req, res) => {
     logger.info("getAllUsers called");
 
-    let input = req.input;
-    let { isActive, firstName } = input;
+    let inputForQuery = req.query;
+    logger.debug(inputForQuery);
+    let { firstName, isActive } = req.query;
 
     //Als er geen isActive en geen firstName is gegeven.
     let query = `SELECT * FROM user`;
 
     //Als er geen isActive maar wel firstName is gegeven.
     if (isActive != undefined && firstName == undefined) {
-      query = `SELECT * FROM user WHERE isActive = ${isActive}`;
+      query = query + ` WHERE isActive = ?`;
       //
       //Als er wel isActive maar geen firstName is gegeven.
     } else if (isActive == undefined && firstName != undefined) {
-      query = `SELECT * FROM user WHERE firstName = ${firstName}`;
+      query = query + ` WHERE firstName = ?`;
       //
       //Als er isActive en firstName is gegeven.
     } else {
-      query = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive}`;
+      query = query + ` WHERE firstName = ? AND WHERE isActive = ?`;
     }
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      connection.query(query, function (error, results, fields) {
-        connection.release();
-        if (error) throw error;
+      connection.query(
+        query,
+        [firstName, isActive],
+        function (error, results, fields) {
+          connection.release();
+          if (error) throw error;
 
-        logger.debug("Found all the users with getAllUsers.");
-        res.status(200).json({
-          status: 200,
-          results: results,
-        });
-      });
+          logger.debug("Found all the users with getAllUsers.");
+          res.status(200).json({
+            status: 200,
+            results: results,
+          });
+        }
+      );
     });
   },
 
