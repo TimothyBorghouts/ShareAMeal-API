@@ -126,25 +126,25 @@ let controller = {
   getAllUsers: (req, res) => {
     logger.info("getAllUsers called");
 
-    let input = req.input;
-    const firstName = input.firstName;
-    const isActive = input.isActive;
+    // let input = req.input;
+    // const firstName = input.firstName;
+    // const isActive = input.isActive;
 
     //Als er geen isActive en geen firstName is gegeven.
     let query = `SELECT * FROM user`;
 
     //Als er geen isActive maar wel firstName is gegeven.
-    if (isActive != undefined && firstName == undefined) {
-      query = `SELECT * FROM user WHERE isActive = ${isActive}`;
-      //
-      //Als er wel isActive maar geen firstName is gegeven.
-    } else if (isActive == undefined && firstName != undefined) {
-      query = `SELECT * FROM user WHERE firstName = ${firstName}`;
-      //
-      //Als er isActive en firstName is gegeven.
-    } else {
-      query = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive}`;
-    }
+    // if (isActive != undefined && firstName == undefined) {
+    //   query = `SELECT * FROM user WHERE isActive = ${isActive}`;
+    //   //
+    //   //Als er wel isActive maar geen firstName is gegeven.
+    // } else if (isActive == undefined && firstName != undefined) {
+    //   query = `SELECT * FROM user WHERE firstName = ${firstName}`;
+    //   //
+    //   //Als er isActive en firstName is gegeven.
+    // } else {
+    //   query = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive}`;
+    // }
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -174,21 +174,12 @@ let controller = {
         [userId],
         function (error, results, fields) {
           connection.release();
-          if (error) throw error;
 
-          if (!results.length == 0) {
-            logger.debug("Found a user with getUserProfile.");
-            res.status(200).json({
-              status: 200,
-              result: results[0],
-            });
-          } else {
-            logger.debug("Found no user with getUserProfile.");
-            res.status(404).json({
-              status: 404,
-              message: "User with Id: " + userId + " does not exist",
-            });
-          }
+          logger.debug("Found a user with getUserProfile.");
+          res.status(200).json({
+            status: 200,
+            result: results[0],
+          });
         }
       );
     });
