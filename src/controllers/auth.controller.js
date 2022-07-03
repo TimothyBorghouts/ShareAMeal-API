@@ -47,16 +47,22 @@ let controller = {
             ) {
               logger.info("password is correct.");
 
-              const user = rows[0];
+              user = rows[0];
+              if (user.isActive) {
+                user.isActive = true;
+              } else {
+                user.isActive = false;
+              }
+
+              const { password, ...userinfo } = rows[0];
               const payload = {
                 userId: userinfo.id,
               };
-              const { password, ...userinfo } = rows[0];
 
               //email en wachtwoord zijn correct dus we geven het token terug.
               jwt.sign(
-                { userid: user.id },
-                jwtSecretKey,
+                payload,
+                process.env.JWT_SECRET,
                 { expiresIn: "30d" },
                 function (err, token) {
                   logger.info(token);
