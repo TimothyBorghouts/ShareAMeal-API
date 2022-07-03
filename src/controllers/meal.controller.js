@@ -84,14 +84,6 @@ let controller = {
           allergenes,
         ],
         function (error, results, fields) {
-          // if (error) {
-          //   connection.release();
-
-          //   res.status(409).json({
-          //     status: 409,
-          //     message: "Meal could not be added to database",
-          //   });
-          // } else {
           connection.query(
             `SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`,
             function (error, results, fields) {
@@ -225,7 +217,7 @@ let controller = {
       if (err) throw err;
 
       connection.query(
-        `SELECT * FROM meal WHERE id = ?;`,
+        `SELECT * FROM meal WHERE id = ?`,
         [mealId],
         function (error, results, fields) {
           connection.release();
@@ -235,7 +227,7 @@ let controller = {
             logger.debug("No user found with getMealById.");
             res.status(404).json({
               status: 404,
-              result: "Maaltijd met Id " + mealId + " bestaat niet",
+              message: "Maaltijd met Id " + mealId + " bestaat niet",
             });
           } else {
             logger.debug("Found specific meal with getMealById.");
@@ -251,7 +243,7 @@ let controller = {
 
             res.status(200).json({
               status: 200,
-              result: meal,
+              result: results[0],
             });
           }
         }
