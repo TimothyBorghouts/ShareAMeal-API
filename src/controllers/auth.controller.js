@@ -7,7 +7,7 @@ const jwtSecretKey = require("../config/config").jwtSecretKey;
 const queryString = `SELECT * FROM user WHERE emailAdress = ?`;
 
 let controller = {
-  //User uses email and password to receive a token.
+  //UC-101 - Inloggen als gebruiker met email en wachtwoord.
   login(req, res, next) {
     logger.info("login is called");
 
@@ -91,6 +91,7 @@ let controller = {
     });
   },
 
+  //Ckeck of de inloggegevens correct zijn.
   validateLogin(req, res, next) {
     logger.info("ValidateLogin called");
 

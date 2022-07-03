@@ -133,58 +133,7 @@ let controller = {
     });
   },
 
-  //UC-302 - Bekijken van alle maaltijden.
-  getAllMeals: (req, res) => {
-    logger.info("getAllMeals called");
-
-    dbconnection.getConnection(function (err, connection) {
-      if (err) throw err;
-      connection.query(`SELECT * FROM meal`, function (error, results, fields) {
-        connection.release();
-        if (error) throw error;
-
-        logger.debug("Found all the meals with getAllMeals.");
-        res.status(200).json({
-          statusCode: 200,
-          results: results,
-        });
-      });
-    });
-  },
-
-  //UC-303 - Een specifieke maaltijd opvragen.
-  getMealById: (req, res) => {
-    logger.info("getMealById called");
-
-    const mealId = req.params.mealId;
-    dbconnection.getConnection(function (err, connection) {
-      if (err) throw err;
-      connection.query(
-        `SELECT * FROM meal Where id = ?`,
-        [mealId],
-        function (error, results, fields) {
-          connection.release();
-          if (error) throw error;
-
-          if (results.length > 0) {
-            logger.debug("Found specific meal with getMealById.");
-            res.status(200).json({
-              status: 200,
-              result: results[0],
-            });
-          } else {
-            logger.debug("No user found with getMealById.");
-            res.status(404).json({
-              status: 404,
-              result: "Maaltijd met Id " + mealId + " bestaat niet",
-            });
-          }
-        }
-      );
-    });
-  },
-
-  //UC-304 - Verander een specifieke maaltijd.
+  //UC-302 - Verander een specifieke maaltijd.
   updateMealById: (req, res) => {
     logger.info("updateMealById called");
 
@@ -228,6 +177,57 @@ let controller = {
             logger.debug("Meal was not found with updateMealById.");
             connection.release();
             return res.status(404).json({
+              status: 404,
+              result: "Maaltijd met Id " + mealId + " bestaat niet",
+            });
+          }
+        }
+      );
+    });
+  },
+
+  //UC-303 - Bekijken van alle maaltijden.
+  getAllMeals: (req, res) => {
+    logger.info("getAllMeals called");
+
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query(`SELECT * FROM meal`, function (error, results, fields) {
+        connection.release();
+        if (error) throw error;
+
+        logger.debug("Found all the meals with getAllMeals.");
+        res.status(200).json({
+          statusCode: 200,
+          results: results,
+        });
+      });
+    });
+  },
+
+  //UC-304 - Een specifieke maaltijd opvragen.
+  getMealById: (req, res) => {
+    logger.info("getMealById called");
+
+    const mealId = req.params.mealId;
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query(
+        `SELECT * FROM meal Where id = ?`,
+        [mealId],
+        function (error, results, fields) {
+          connection.release();
+          if (error) throw error;
+
+          if (results.length > 0) {
+            logger.debug("Found specific meal with getMealById.");
+            res.status(200).json({
+              status: 200,
+              result: results[0],
+            });
+          } else {
+            logger.debug("No user found with getMealById.");
+            res.status(404).json({
               status: 404,
               result: "Maaltijd met Id " + mealId + " bestaat niet",
             });
