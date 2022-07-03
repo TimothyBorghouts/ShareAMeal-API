@@ -25,6 +25,24 @@ let controller = {
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.");
 
+      next();
+    } catch (err) {
+      logger.debug("Wrong user input");
+      const error = {
+        status: 400,
+        message: err.message,
+      };
+      next(error);
+    }
+  },
+
+  validatePhoneNumber: (req, res, next) => {
+    logger.info("validatePhoneNumber called");
+
+    let user = req.body;
+    let { phoneNumber } = user;
+
+    try {
       //Couldn't create regex by myself so I used this regex: https://stackoverflow.com/questions/17949757/regular-expression-for-dutch-phone-number
       assert.match(
         phoneNumber,
@@ -34,7 +52,6 @@ let controller = {
 
       next();
     } catch (err) {
-      logger.debug("Wrong user input");
       const error = {
         status: 400,
         message: err.message,
