@@ -3,10 +3,10 @@ const chai = require("chai");
 const chaiHttps = require("chai-http");
 const server = require("../../index");
 const assert = require("assert");
-const logger = require("../config/config").logger;
+const logger = require("../../../config/config").logger;
 const dbconnection = require("../../src/database/dbconnection");
 const jwt = require("jsonwebtoken");
-const { jwtSecretKey, logger } = require("../../src/config/config");
+const jwtSecretKey = require("../../../config/config");
 
 chai.should();
 chai.use(chaiHttps);
