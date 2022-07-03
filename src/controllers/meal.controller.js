@@ -253,26 +253,28 @@ let controller = {
   deleteMealById: (req, res) => {
     logger.info("deleteMealById called");
 
-    const userId = req.params.userId;
+    const mealId = req.params.mealId;
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
+
       connection.query(
-        "SELECT * FROM user Where id = ",
-        [userId],
+        "SELECT * FROM meal Where id = ?;",
+        [mealId],
         function (error, results, fields) {
           if (error) throw error;
 
           if (results.length == 0) {
             logger.debug("Meal was not found with deleteMealById.");
             connection.release();
-            res.status(400).json({
-              status: 400,
+            res.status(404).json({
+              status: 404,
               result: "Maaltijd met Id " + mealId + " bestaat niet",
             });
           } else {
             connection.query(
-              "DELETE FROM user Where id = " + userId,
+              "DELETE FROM meal Where id = ?",
+              [mealId],
               function (error, results, fields) {
                 connection.release();
                 if (error) throw error;
