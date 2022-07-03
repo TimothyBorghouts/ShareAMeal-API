@@ -58,35 +58,35 @@ let controller = {
       price,
     } = meal;
 
-    // dbconnection.getConnection(function (err, connection) {
-    //   if (err) throw err;
-    //   connection.query(
-    //     `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
-    //     [
-    //       isActive,
-    //       isVega,
-    //       isVegan,
-    //       isToTakeHome,
-    //       dateTime,
-    //       maxAmountOfParticipants,
-    //       price,
-    //       imageUrl,
-    //       cookId,
-    //       name,
-    //       description,
-    //     ],
-    //     function (err, results, fields) {
-    //       connection.release();
-    //       if (err) throw err;
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query(
+        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
+        [
+          isActive,
+          isVega,
+          isVegan,
+          isToTakeHome,
+          dateTime,
+          maxAmountOfParticipants,
+          price,
+          imageUrl,
+          cookId,
+          name,
+          description,
+        ],
+        function (err, results, fields) {
+          connection.release();
+          if (err) throw err;
 
-    //       logger.debug("Added meal to database with addMeal.");
-    //       res.status(201).json({
-    //         status: 201,
-    //         result: "Maaltijd is toegevoegt aan de database",
-    //       });
-    //     }
-    // );
-    // });
+          logger.debug("Added meal to database with addMeal.");
+          res.status(301).json({
+            status: 301,
+            result: "Maaltijd is toegevoegt aan de database",
+          });
+        }
+      );
+    });
   },
 
   //UC-302 - Bekijken van alle maaltijden.
@@ -98,8 +98,8 @@ let controller = {
         if (error) throw error;
 
         logger.debug("Found all the meals with getAllMeals.");
-        res.status(200).json({
-          statusCode: 200,
+        res.status(302).json({
+          statusCode: 302,
           results: results,
         });
       });
@@ -120,8 +120,8 @@ let controller = {
 
           if (results.length > 0) {
             logger.debug("Found specific meal with getMealById.");
-            res.status(200).json({
-              status: 200,
+            res.status(303).json({
+              status: 303,
               result: results[0],
             });
           } else {
@@ -167,8 +167,8 @@ let controller = {
                 if (error) throw error;
 
                 logger.debug("Updated meal with updateMealById.");
-                res.status(200).json({
-                  status: 200,
+                res.status(304).json({
+                  status: 304,
                   result: meal,
                 });
               }
@@ -204,8 +204,8 @@ let controller = {
                 if (error) throw error;
 
                 logger.debug("Deleted meal with deleteMealById.");
-                res.status(200).json({
-                  status: 200,
+                res.status(305).json({
+                  status: 305,
                   result: "Maaltijd is uit de database verwijderd",
                 });
               }
