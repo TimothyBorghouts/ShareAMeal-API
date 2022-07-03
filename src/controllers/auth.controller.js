@@ -4,7 +4,7 @@ const dbconnection = require("../../database/dbconnection");
 const logger = require("../config/config").logger;
 const jwtSecretKey = require("../config/config").jwtSecretKey;
 
-const queryString = `SELECT id, firstName, lastName, emailAdress, password FROM user WHERE emailAdress = ?`;
+const queryString = `SELECT * FROM user WHERE emailAdress = ?`;
 
 let controller = {
   //User uses emaal and password to receive a token.
@@ -48,6 +48,9 @@ let controller = {
               logger.info("password is correct.");
 
               const user = rows[0];
+              const payload = {
+                userId: userinfo.id,
+              };
               const { password, ...userinfo } = rows[0];
 
               //email en wachtwoord zijn correct dus we geven het token terug.
