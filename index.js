@@ -35,7 +35,10 @@ app.all("*", (req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   logger.debug("Error handler called.");
-  res.status(err.status).json(err);
+  res.status(500).json({
+    status: 500,
+    message: err.toString(),
+  });
 });
 
 // Messages when server opens
@@ -48,7 +51,6 @@ process.on("SIGINT", () => {
   dbconnection.end((err) => {
     logger.debug("Database connection closed");
   });
-  //Messages when server closes
   app.close(() => {
     logger.debug("Server closed");
   });
