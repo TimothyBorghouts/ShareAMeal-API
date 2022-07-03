@@ -128,21 +128,19 @@ let controller = {
 
     let inputForQuery = req.query;
     logger.debug(inputForQuery);
-    let { firstName, isActive } = inputForQuery;
-
-    //Als er geen isActive en geen firstName is gegeven.
-    let queryString = `SELECT * FROM user;`;
+    let firstName = inputForQuery.firstName;
+    let isActive = inputForQuery.isActive;
 
     //Als er isActive en firstName is gegeven.
     if (isActive != undefined && firstName != undefined) {
-      queryString = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive};`;
+      queryString = `SELECT * FROM user WHERE firstName = '${firstName}' AND isActive = '${isActive}';`;
       //
       //Als er geen isActive maar wel firstName is gegeven.
     } else if (isActive != undefined && firstName == undefined) {
       queryString = `SELECT * FROM user WHERE isActive = ${isActive};`;
       //
       //Als er wel isActive maar geen firstName is gegeven.
-    } else if (isActive == undefined && firstName != undefined) {
+    } else {
       queryString = `SELECT * FROM user WHERE firstName = ${firstName};`;
     }
 
@@ -155,13 +153,13 @@ let controller = {
             status: 404,
             message: "Could not found users.",
           });
+        } else {
+          logger.debug("Found all the users with getAllUsers.");
+          res.status(200).json({
+            status: 200,
+            result: results,
+          });
         }
-
-        logger.debug("Found all the users with getAllUsers.");
-        res.status(200).json({
-          status: 200,
-          result: results,
-        });
       });
     });
   },
