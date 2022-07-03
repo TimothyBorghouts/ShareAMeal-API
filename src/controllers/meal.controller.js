@@ -138,52 +138,52 @@ let controller = {
     logger.info("updateMealById called");
 
     const mealId = req.params.userId;
-    // logger.debug(mealId);
-    // let meal = req.body;
-    // let {
-    //   name,
-    //   description,
-    //   price,
-    //   isActive,
-    //   isVega,
-    //   isVegan,
-    //   isToTakeHome,
-    //   imageUrl,
-    //   dateTime,
-    // } = meal;
+    logger.debug(mealId);
+    let meal = req.body;
+    let {
+      name,
+      description,
+      price,
+      isActive,
+      isVega,
+      isVegan,
+      isToTakeHome,
+      imageUrl,
+      dateTime,
+    } = meal;
 
-    // dbconnection.getConnection(function (err, connection) {
-    //   if (err) throw err;
-    //   connection.query(
-    //     "SELECT * FROM user Where id = " + userId,
-    //     function (error, results, fields) {
-    //       if (error) throw error;
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query(
+        "SELECT * FROM user Where id = " + [userId],
+        function (error, results, fields) {
+          if (error) throw error;
 
-    //       if (results.length > 0) {
-    //         connection.query(
-    //           `UPDATE meal SET firstName = ?, lastName = ?, isActive = ?, emailAdress = ?, password = ?, phoneNumber = ?, street = ?, city = ? WHERE id = ${mealId}`,
-    //           function (error, results, fields) {
-    //             connection.release();
-    //             if (error) throw error;
+          // if (results.length > 0) {
+          //   connection.query(
+          //     `UPDATE meal SET firstName = ?, lastName = ?, isActive = ?, emailAdress = ?, password = ?, phoneNumber = ?, street = ?, city = ? WHERE id = ${mealId}`,
+          //     function (error, results, fields) {
+          //       connection.release();
+          //       if (error) throw error;
 
-    //             logger.debug("Updated meal with updateMealById.");
-    //             res.status(200).json({
-    //               status: 200,
-    //               result: meal,
-    //             });
-    //           }
-    //         );
-    //       } else {
-    //         logger.debug("Meal was not found with updateMealById.");
-    //         connection.release();
-    return res.status(404).json({
-      status: 404,
-      result: "Maaltijd met Id bestaat niet",
+          //       logger.debug("Updated meal with updateMealById.");
+          //       res.status(200).json({
+          //         status: 200,
+          //         result: meal,
+          //       });
+          //     }
+          //   );
+          // } else {
+          logger.debug("Meal was not found with updateMealById.");
+          connection.release();
+          return res.status(404).json({
+            status: 404,
+            result: "Maaltijd met Id bestaat niet",
+          });
+          // }
+        }
+      );
     });
-    //       }
-    //     }
-    //   );
-    // });
   },
 
   //UC-303 - Bekijken van alle maaltijden.
