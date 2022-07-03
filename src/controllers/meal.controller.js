@@ -123,7 +123,7 @@ let controller = {
                 logger.debug("Added meal to database with addUser.");
                 res.status(201).json({
                   status: 201,
-                  result: meal,
+                  result: results[0],
                 });
               }
             );
@@ -139,16 +139,20 @@ let controller = {
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      connection.query(`SELECT * FROM meal`, function (error, results, fields) {
-        connection.release();
-        if (error) throw error;
 
-        logger.debug("Found all the meals with getAllMeals.");
-        res.status(200).json({
-          statusCode: 200,
-          results: results,
-        });
-      });
+      connection.query(
+        `SELECT * FROM meal;`,
+        function (error, results, fields) {
+          connection.release();
+          if (error) throw error;
+
+          logger.debug("Found all the meals with getAllMeals.");
+          res.status(200).json({
+            statusCode: 200,
+            results: results,
+          });
+        }
+      );
     });
   },
 
@@ -185,56 +189,57 @@ let controller = {
   },
 
   //UC-304 - Verander een specifieke maaltijd.
-  updateMealById: (req, res) => {
-    logger.info("updateMealById called");
+  // updateMealById: (req, res) => {
+  //   logger.info("updateMealById called");
 
-    const mealId = req.params.userId;
-    let meal = req.body;
-    let {
-      name,
-      description,
-      price,
-      isActive,
-      isVega,
-      isVegan,
-      isToTakeHome,
-      imageUrl,
-      dateTime,
-    } = meal;
+  //   const mealId = req.params.userId;
+  //   logger.debug(mealId);
+  //   let meal = req.body;
+  //   let {
+  //     name,
+  //     description,
+  //     price,
+  //     isActive,
+  //     isVega,
+  //     isVegan,
+  //     isToTakeHome,
+  //     imageUrl,
+  //     dateTime,
+  //   } = meal;
 
-    dbconnection.getConnection(function (err, connection) {
-      if (err) throw err;
-      connection.query(
-        "SELECT * FROM user Where id = " + userId,
-        function (error, results, fields) {
-          if (error) throw error;
+  //   dbconnection.getConnection(function (err, connection) {
+  //     if (err) throw err;
+  //     connection.query(
+  //       "SELECT * FROM user Where id = " + userId,
+  //       function (error, results, fields) {
+  //         if (error) throw error;
 
-          if (results.length > 0) {
-            connection.query(
-              `UPDATE meal SET firstName = ?, lastName = ?, isActive = ?, emailAdress = ?, password = ?, phoneNumber = ?, street = ?, city = ? WHERE id = ${mealId}`,
-              function (error, results, fields) {
-                connection.release();
-                if (error) throw error;
+  //         if (results.length > 0) {
+  //           connection.query(
+  //             `UPDATE meal SET firstName = ?, lastName = ?, isActive = ?, emailAdress = ?, password = ?, phoneNumber = ?, street = ?, city = ? WHERE id = ${mealId}`,
+  //             function (error, results, fields) {
+  //               connection.release();
+  //               if (error) throw error;
 
-                logger.debug("Updated meal with updateMealById.");
-                res.status(200).json({
-                  status: 200,
-                  result: meal,
-                });
-              }
-            );
-          } else {
-            logger.debug("Meal was not found with updateMealById.");
-            connection.release();
-            return res.status(404).json({
-              status: 404,
-              result: "Maaltijd met Id " + mealId + " bestaat niet",
-            });
-          }
-        }
-      );
-    });
-  },
+  //               logger.debug("Updated meal with updateMealById.");
+  //               res.status(200).json({
+  //                 status: 200,
+  //                 result: meal,
+  //               });
+  //             }
+  //           );
+  //         } else {
+  //           logger.debug("Meal was not found with updateMealById.");
+  //           connection.release();
+  //           return res.status(404).json({
+  //             status: 404,
+  //             result: "Maaltijd met Id " + mealId + " bestaat niet",
+  //           });
+  //         }
+  //       }
+  //     );
+  //   });
+  // },
 
   //UC-305 - Verwijder een maaltijd.
   deleteMealById: (req, res) => {
