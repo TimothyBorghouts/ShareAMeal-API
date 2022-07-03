@@ -279,7 +279,7 @@ let controller = {
             connection.release();
             res.status(404).json({
               status: 404,
-              result: "Maaltijd met Id " + mealId + " bestaat niet",
+              message: "Maaltijd met Id " + mealId + " bestaat niet",
             });
           } else {
             connection.query(
@@ -292,7 +292,7 @@ let controller = {
                 logger.debug("Deleted meal with deleteMealById.");
                 res.status(200).json({
                   status: 200,
-                  result: "Maaltijd is uit de database verwijderd",
+                  message: "Maaltijd is uit de database verwijderd",
                 });
               }
             );
