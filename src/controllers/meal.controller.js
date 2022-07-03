@@ -46,23 +46,7 @@ let controller = {
     let meal = req.body;
     let cookId = req.userId;
     let allergenes = req.body.allergenes.join();
-    // let price = parseFloat(meal.price);
-
-    logger.debug(meal);
-    logger.debug(
-      meal.isActive,
-      meal.isVega,
-      meal.isVegan,
-      meal.isToTakeHome,
-      meal.dateTime,
-      meal.maxAmountOfParticipants,
-      meal.price,
-      meal.imageUrl,
-      cookId,
-      meal.name,
-      meal.description,
-      meal.allergies
-    );
+    let price = parseFloat(meal.price);
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -76,7 +60,7 @@ let controller = {
           meal.isToTakeHome,
           meal.dateTime,
           meal.maxAmountOfParticipants,
-          meal.price,
+          price,
           meal.imageUrl,
           cookId,
           meal.name,
@@ -84,41 +68,43 @@ let controller = {
           allergenes,
         ],
         function (error, results, fields) {
+          if (error) throw error;
           connection.query(
             `SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`,
             function (error, results, fields) {
+              if (error) throw error;
               connection.release();
 
-              meal = results[0];
+              // meal = results[0];
 
-              if (meal.isActive) {
-                meal.isActive = true;
-              } else {
-                meal.isActive = false;
-              }
+              // if (meal.isActive) {
+              //   meal.isActive = true;
+              // } else {
+              //   meal.isActive = false;
+              // }
 
-              if (meal.isVega) {
-                meal.isVega = true;
-              } else {
-                meal.isVega = false;
-              }
+              // if (meal.isVega) {
+              //   meal.isVega = true;
+              // } else {
+              //   meal.isVega = false;
+              // }
 
-              if (meal.isVegan) {
-                meal.isVegan = true;
-              } else {
-                meal.isVegan = false;
-              }
+              // if (meal.isVegan) {
+              //   meal.isVegan = true;
+              // } else {
+              //   meal.isVegan = false;
+              // }
 
-              if (meal.isToTakeHome) {
-                meal.isToTakeHome = true;
-              } else {
-                meal.isToTakeHome = false;
-              }
+              // if (meal.isToTakeHome) {
+              //   meal.isToTakeHome = true;
+              // } else {
+              //   meal.isToTakeHome = false;
+              // }
 
               logger.debug("Added meal to database.");
               res.status(201).json({
                 status: 201,
-                result: meal,
+                result: results[0],
               });
             }
           );
