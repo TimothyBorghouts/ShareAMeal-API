@@ -46,15 +46,26 @@ let controller = {
     let meal = req.body;
     let cookId = req.userId;
 
-    let allergenes = meal.allergenes.join();
-
     logger.debug(meal);
+    logger.debug(
+      meal.isActive,
+      meal.isVega,
+      meal.isVegan,
+      meal.isToTakeHome,
+      meal.dateTime,
+      meal.maxAmountOfParticipants,
+      meal.price,
+      meal.imageUrl,
+      cookId,
+      meal.name,
+      meal.description
+    );
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
       connection.query(
-        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description, allergenes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
         [
           meal.isActive,
           meal.isVega,
@@ -67,7 +78,6 @@ let controller = {
           cookId,
           meal.name,
           meal.description,
-          allergenes,
         ],
         function (err, results, fields) {
           if (err) {
@@ -113,7 +123,7 @@ let controller = {
 
                 if (error) throw error;
 
-                logger.debug("Added meal to database with addUser.");
+                logger.debug("Added meal to database.");
                 res.status(201).json({
                   status: 201,
                   result: results[0],
