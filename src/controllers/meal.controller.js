@@ -46,7 +46,7 @@ let controller = {
     let meal = req.body;
     let cookId = req.userId;
     let allergenes = req.body.allergenes.join();
-    // let price = parseFloat(meal.price);
+    let price = parseFloat(meal.price);
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -73,8 +73,11 @@ let controller = {
             `SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`,
             function (error, results, fields) {
               connection.release();
+              if (error) throw error;
 
               meal = results[0];
+
+              meal.price = price;
 
               if (meal.isActive) {
                 meal.isActive = true;
