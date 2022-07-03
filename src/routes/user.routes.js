@@ -32,7 +32,6 @@ router.put(
   "/api/user/:userId",
   authController.validateToken,
   userController.validateUser,
-  userController.validatePhoneNumber,
   userController.updateUserById
 );
 
