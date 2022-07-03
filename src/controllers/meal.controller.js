@@ -50,6 +50,7 @@ let controller = {
       isVegan,
       isToTakeHome,
       dateTime,
+      cookId,
       imageUrl,
       maxAmountOfParticipants,
       price,
@@ -58,18 +59,19 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        `INSERT INTO user ( name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, maxAmountOfParticipants, price) VALUES(?,?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO user ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?);`,
         [
-          name,
-          description,
           isActive,
           isVega,
           isVegan,
           isToTakeHome,
           dateTime,
-          imageUrl,
           maxAmountOfParticipants,
           price,
+          imageUrl,
+          cookId,
+          name,
+          description,
         ],
         function (err, results, fields) {
           connection.release();
