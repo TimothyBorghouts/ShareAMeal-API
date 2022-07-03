@@ -61,28 +61,29 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
-        [
-          isActive,
-          isVega,
-          isVegan,
-          isToTakeHome,
-          dateTime,
-          maxAmountOfParticipants,
-          price,
-          imageUrl,
-          cookId,
-          name,
-          description,
-        ],
+        "SELECT * FROM meal",
+
+        // `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
+        // [
+        //   isActive,
+        //   isVega,
+        //   isVegan,
+        //   isToTakeHome,
+        //   dateTime,
+        //   maxAmountOfParticipants,
+        //   price,
+        //   imageUrl,
+        //   cookId,
+        //   name,
+        //   description,
+        // ],
         function (err, results, fields) {
           connection.release();
           if (err) throw err;
 
-          logger.debug("Added meal to database with addMeal.");
-          res.status(301).json({
-            status: 301,
-            result: "Maaltijd is toegevoegt aan de database",
+          res.status(201).json({
+            status: 201,
+            result: "",
           });
         }
       );
@@ -91,6 +92,8 @@ let controller = {
 
   //UC-302 - Bekijken van alle maaltijden.
   getAllMeals: (req, res) => {
+    logger.info("getAllMeals called");
+
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(`SELECT * FROM meal`, function (error, results, fields) {
@@ -98,8 +101,8 @@ let controller = {
         if (error) throw error;
 
         logger.debug("Found all the meals with getAllMeals.");
-        res.status(302).json({
-          statusCode: 302,
+        res.status(200).json({
+          statusCode: 200,
           results: results,
         });
       });
@@ -108,6 +111,8 @@ let controller = {
 
   //UC-303 - Een specifieke maaltijd opvragen.
   getMealById: (req, res) => {
+    logger.info("getMealById called");
+
     const mealId = req.params.mealId;
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -120,8 +125,8 @@ let controller = {
 
           if (results.length > 0) {
             logger.debug("Found specific meal with getMealById.");
-            res.status(303).json({
-              status: 303,
+            res.status(200).json({
+              status: 200,
               result: results[0],
             });
           } else {
@@ -138,6 +143,8 @@ let controller = {
 
   //UC-304 - Verander een specifieke maaltijd.
   updateMealById: (req, res) => {
+    logger.info("updateMealById called");
+
     const mealId = req.params.userId;
     let meal = req.body;
     let {
@@ -167,8 +174,8 @@ let controller = {
                 if (error) throw error;
 
                 logger.debug("Updated meal with updateMealById.");
-                res.status(304).json({
-                  status: 304,
+                res.status(200).json({
+                  status: 200,
                   result: meal,
                 });
               }
@@ -188,6 +195,8 @@ let controller = {
 
   //UC-305 - Verwijder een maaltijd.
   deleteMealById: (req, res) => {
+    logger.info("deleteMealById called");
+
     const userId = req.params.userId;
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
@@ -204,8 +213,8 @@ let controller = {
                 if (error) throw error;
 
                 logger.debug("Deleted meal with deleteMealById.");
-                res.status(305).json({
-                  status: 305,
+                res.status(200).json({
+                  status: 200,
                   result: "Maaltijd is uit de database verwijderd",
                 });
               }
