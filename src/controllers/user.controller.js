@@ -7,15 +7,7 @@ let controller = {
     logger.info("validateUser called");
 
     let user = req.body;
-    let {
-      firstName,
-      lastName,
-      emailAdress,
-      password,
-      phoneNumber,
-      street,
-      city,
-    } = user;
+    let { firstName, lastName, emailAdress, password, street, city } = user;
 
     try {
       assert(typeof firstName === "string", "Firstname must be a string.");
@@ -32,16 +24,34 @@ let controller = {
       );
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.");
+
+      next();
+    } catch (err) {
+      logger.debug("Wrong user input");
+      const error = {
+        status: 400,
+        message: err.message,
+      };
+      next(error);
+    }
+  },
+
+  validatePhoneNumber: (req, res, next) => {
+    logger.info("validatePhoneNumber called");
+
+    let user = req.body;
+    let { phoneNumber } = user;
+
+    try {
       //Regex die checkt of er een telefoonnummer is ingevoerd met misschien een + dan 2 of meer cijfers, een streepje en ergens ook meerdere cijfers.
       assert.match(
         phoneNumber,
-        /([0-9]{2}-?[0-9]{4,})/,
+        /([0-9]{2}-[0-9]{4,})/,
         "The phonenumber is incorrect."
       );
 
       next();
     } catch (err) {
-      logger.debug("Wrong user input");
       const error = {
         status: 400,
         message: err.message,
