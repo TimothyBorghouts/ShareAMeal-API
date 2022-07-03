@@ -67,8 +67,8 @@ let controller = {
           meal.description,
           allergenes,
         ],
-        function (error, results, fields) {
-          if (error) throw error;
+        function (err, results, fields) {
+          if (err) throw err;
           connection.query(
             `SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`,
             function (error, results, fields) {
