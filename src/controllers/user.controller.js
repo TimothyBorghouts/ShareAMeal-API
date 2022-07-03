@@ -61,7 +61,7 @@ let controller = {
   },
 
   //UC-201 - Toevoegen van een gebruiker.
-  addUser: (req, res) => {
+  addUser: (req, res, next) => {
     logger.info("addUser called");
 
     let user = req.body;
