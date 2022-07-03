@@ -135,15 +135,15 @@ let controller = {
 
     //Als er geen isActive maar wel firstName is gegeven.
     if (isActive != undefined && firstName == undefined) {
-      queryString = `SELECT * FROM user WHERE isActive = ${isActive}`;
+      queryString = `SELECT * FROM user WHERE isActive = ${isActive};`;
       //
       //Als er wel isActive maar geen firstName is gegeven.
     } else if (isActive == undefined && firstName != undefined) {
-      queryString = `SELECT * FROM user WHERE firstName = ${firstName}`;
+      queryString = `SELECT * FROM user WHERE firstName = ${firstName};`;
       //
       //Als er isActive en firstName is gegeven.
-    } else {
-      queryString = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive}`;
+    } else if (isActive != undefined && firstName != undefined) {
+      queryString = `SELECT * FROM user WHERE firstName = ${firstName} AND WHERE isActive = ${isActive};`;
     }
 
     dbconnection.getConnection(function (err, connection) {
@@ -155,7 +155,7 @@ let controller = {
         logger.debug("Found all the users with getAllUsers.");
         res.status(200).json({
           status: 200,
-          results: results,
+          result: results,
         });
       });
     });
