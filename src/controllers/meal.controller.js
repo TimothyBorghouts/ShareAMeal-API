@@ -184,7 +184,7 @@ let controller = {
             logger.debug("Meal was not found with updateMealById.");
             return res.status(404).json({
               status: 404,
-              result: "Maaltijd met Id bestaat niet",
+              message: "Maaltijd met Id bestaat niet",
             });
           }
         }

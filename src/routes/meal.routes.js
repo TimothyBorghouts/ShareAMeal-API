@@ -15,7 +15,7 @@ router.post(
 router.put(
   "/api/meal/:mealId",
   authController.validateToken,
-  // mealController.validateMeal,
+  mealController.validateMeal,
   mealController.updateMealById
 );
 
