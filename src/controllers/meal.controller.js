@@ -8,25 +8,25 @@ let controller = {
     let {
       name,
       description,
-      price,
       isActive,
       isVega,
       isVegan,
       isToTakeHome,
-      imageUrl,
       dateTime,
+      imageUrl,
+      price,
     } = meal;
 
     try {
       assert(typeof name === "string", "Name must be a string");
       assert(typeof description === "string", "Description must be a string!");
-      assert(typeof price === "number", "Price must be a number");
       assert(isActive != null, "isActive is invalid");
       assert(isVega != null, "isVega is invalid");
       assert(isVegan != null, "isVegan is invalid");
       assert(isToTakeHome != null, "isToTakeHome is invalid");
-      assert(typeof imageUrl === "string", "Image url must be a string");
       assert(typeof dateTime === "string", "DateTime must be a string");
+      assert(typeof imageUrl === "string", "Image url must be a string");
+      assert(typeof price === "number", "Price must be a number");
 
       next();
     } catch (err) {
@@ -45,36 +45,33 @@ let controller = {
     let {
       name,
       description,
-      price,
       isActive,
       isVega,
       isVegan,
       isToTakeHome,
-      imageUrl,
       dateTime,
+      imageUrl,
+      maxAmountOfParticipants,
+      price,
     } = meal;
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
-        `INSERT INTO user ( name, description, price, isActive, isVega, isVegan, isToTakeHome, imageUrl, dateTime) VALUES(?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO user ( name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, maxAmountOfParticipants, price) VALUES(?,?,?,?,?,?,?,?,?,?);`,
         [
+          name,
+          description,
           isActive,
           isVega,
           isVegan,
           isToTakeHome,
           dateTime,
+          imageUrl,
           maxAmountOfParticipants,
           price,
-          imageUrl,
-          cookId,
-          createDate,
-          updateDate,
-          name,
-          description,
-          allergenes,
         ],
-        function (error, results, fields) {
+        function (err, results, fields) {
           connection.release();
           if (err) throw err;
 
