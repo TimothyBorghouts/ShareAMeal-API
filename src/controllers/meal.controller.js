@@ -40,10 +40,11 @@ let controller = {
   },
 
   //UC-301 - Toevoegen van een maaltijd.
-  addMeal: (req, res) => {
+  addMeal: (req, res, next) => {
     logger.info("addMeal called");
 
     let meal = req.body;
+    logger.debug(meal);
     let {
       name,
       description,
@@ -60,31 +61,73 @@ let controller = {
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
+
       connection.query(
-        "SELECT * FROM meal",
-
-        // `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
-        // [
-        //   isActive,
-        //   isVega,
-        //   isVegan,
-        //   isToTakeHome,
-        //   dateTime,
-        //   maxAmountOfParticipants,
-        //   price,
-        //   imageUrl,
-        //   cookId,
-        //   name,
-        //   description,
-        // ],
+        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
+        [
+          isActive,
+          isVega,
+          isVegan,
+          isToTakeHome,
+          dateTime,
+          maxAmountOfParticipants,
+          price,
+          imageUrl,
+          cookId,
+          name,
+          description,
+        ],
         function (err, results, fields) {
-          connection.release();
-          if (err) throw err;
+          if (err) {
+            connection.release();
+            logger.debug("Could not add meal to database.");
 
-          res.status(201).json({
-            status: 201,
-            result: "",
-          });
+            res.status(409).json({
+              status: 409,
+              message: "Meal could not be added to database",
+            });
+          } else {
+            connection.query(
+              `SELECT * FROM meal WHERE name = '${meal.name}'`,
+              function (error, results, fields) {
+                connection.release();
+
+                meal = results[0];
+
+                if (meal.isActive) {
+                  meal.isActive = true;
+                } else {
+                  meal.isActive = false;
+                }
+
+                if (meal.isVega) {
+                  meal.isVega = true;
+                } else {
+                  meal.isVega = false;
+                }
+
+                if (meal.isVegan) {
+                  meal.isVegan = true;
+                } else {
+                  meal.isVegan = false;
+                }
+
+                if (meal.isToTakeHome) {
+                  meal.isToTakeHome = true;
+                } else {
+                  meal.isToTakeHome = false;
+                }
+
+                if (error) throw error;
+
+                logger.debug("Added meal to database with addUser.");
+                res.status(201).json({
+                  status: 201,
+                  result: meal,
+                });
+              }
+            );
+          }
         }
       );
     });
