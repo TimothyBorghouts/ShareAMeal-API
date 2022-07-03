@@ -43,10 +43,10 @@ let controller = {
     let { phoneNumber } = user;
 
     try {
-      //Regex die checkt of er een telefoonnummer is ingevoerd met misschien een + dan 2 of meer cijfers, een streepje en ergens ook meerdere cijfers.
+      //Couldn't create regex by myself so I used this regex: https://stackoverflow.com/questions/17949757/regular-expression-for-dutch-phone-number
       assert.match(
         phoneNumber,
-        /([0-9]{2}-[0-9]{4,})/,
+        /(^\+[0-9]{2}|^\+[0-9]{2}\(0\)|^\(\+[0-9]{2}\)\(0\)|^00[0-9]{2}|^0)([0-9]{9}$|[0-9\-\s]{10}$)/,
         "The phonenumber is incorrect."
       );
 
