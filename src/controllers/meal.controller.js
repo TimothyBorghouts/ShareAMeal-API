@@ -45,6 +45,8 @@ let controller = {
 
     let meal = req.body;
     let cookId = req.userId;
+    let allergenes = req.body.allergenes.join();
+    let price = parseFloat(meal.price);
 
     logger.debug(meal);
     logger.debug(
@@ -54,18 +56,19 @@ let controller = {
       meal.isToTakeHome,
       meal.dateTime,
       meal.maxAmountOfParticipants,
-      meal.price,
+      price,
       meal.imageUrl,
       cookId,
       meal.name,
-      meal.description
+      meal.description,
+      meal.allergies
     );
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
       connection.query(
-        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description) VALUES(?,?,?,?,?,?,?,?,?,?,?);`,
+        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description, allergenes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);`,
         [
           meal.isActive,
           meal.isVega,
@@ -73,11 +76,12 @@ let controller = {
           meal.isToTakeHome,
           meal.dateTime,
           meal.maxAmountOfParticipants,
-          meal.price,
+          price,
           meal.imageUrl,
           cookId,
           meal.name,
           meal.description,
+          allergenes,
         ],
         function (err, results, fields) {
           if (err) {
