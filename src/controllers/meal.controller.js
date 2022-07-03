@@ -86,7 +86,6 @@ let controller = {
         function (error, results, fields) {
           // if (error) {
           //   connection.release();
-          //   logger.debug("Could not add meal to database.");
 
           //   res.status(409).json({
           //     status: 409,
