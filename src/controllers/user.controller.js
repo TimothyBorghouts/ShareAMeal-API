@@ -32,10 +32,10 @@ let controller = {
       );
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(password, /([0-9a-zA-Z]{8,})/, "The password is to short.");
-      //Regex die checkt of er een telefoonnummer is ingevoerd met misschien een + dan 2 of meer cijfers, een streepje en ergens ook meerdere cijfers.
+      //Regex die checkt of er een geldig telefoonnummer is ingevoerd.
       assert.match(
         phoneNumber,
-        /([0-9]{2}-?[0-9]{4,})/,
+        /(([0-9]{8,}))/,
         "The phonenumber is incorrect."
       );
 
@@ -70,15 +70,13 @@ let controller = {
       if (err) throw err;
 
       connection.query(
-        `INSERT INTO user (firstName, lastName, emailAdress, password, phoneNumber, street, city) VALUES(?,?,?,?,?,?,?);`,
+        `INSERT INTO user (firstName, lastName, emailAdress, password, street, city) VALUES(?,?,?,?,?,?);`,
         [firstName, lastName, emailAdress, password, phoneNumber, street, city],
-        function (err, results, fields) {
-          if (err) {
-            connection.release();
+        function (error, results, fields) {
+          if (error) {
             logger.debug(
               "Could not add user to database, email alreadt exists."
             );
-
             res.status(409).json({
               status: 409,
               message:
@@ -220,7 +218,15 @@ let controller = {
           if (results.length > 0) {
             connection.query(
               `UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, street = ?, city = ? WHERE id = ${userId}`,
-              [firstName, lastName, emailAdress, password, street, city],
+              [
+                firstName,
+                lastName,
+                emailAdress,
+                password,
+                phonenumber,
+                street,
+                city,
+              ],
               function (error, results, fields) {
                 connection.release();
                 if (error) throw error;
