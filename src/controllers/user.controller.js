@@ -146,19 +146,30 @@ let controller = {
     logger.info("getUserProfile called");
 
     const userId = req.userId;
+
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
       connection.query(
         `SELECT * FROM user Where id = ?`,
         [userId],
-        function (error, results, fields) {
+        function (err, results, fields) {
           connection.release();
+          if (err) {
+            throw err;
+          }
 
-          if (results.length > 0) {
+          user = results[0];
+          if (user.isActive) {
+            user.isActive = true;
+          } else {
+            user.isActive = false;
+          }
+
+          if (!results.length == 0) {
             logger.debug("Found a user with getUserProfile.");
             res.status(200).json({
               status: 200,
-              result: results[0],
+              result: user,
             });
           } else {
             logger.debug("Found no user with getUserProfile.");
