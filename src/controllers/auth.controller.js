@@ -1,13 +1,13 @@
 const assert = require("assert");
-const jwt = require("jsonwebtoken");
 const dbconnection = require("../../database/dbconnection");
+const jwt = require("jsonwebtoken");
 const logger = require("../config/config").logger;
 const jwtSecretKey = require("../config/config").jwtSecretKey;
 
 const queryString = `SELECT * FROM user WHERE emailAdress = ?`;
 
 let controller = {
-  //User uses emaal and password to receive a token.
+  //User uses email and password to receive a token.
   login(req, res, next) {
     logger.info("login is called");
 
@@ -62,7 +62,7 @@ let controller = {
               //email en wachtwoord zijn correct dus we geven het token terug.
               jwt.sign(
                 payload,
-                process.env.JWT_SECRET,
+                jwtSecretKey,
                 { expiresIn: "30d" },
                 function (err, token) {
                   logger.info(token);

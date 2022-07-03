@@ -1,5 +1,5 @@
-const dbconnection = require("../../database/dbconnection");
 const assert = require("assert");
+const dbconnection = require("../../database/dbconnection");
 const logger = require("../config/config").logger;
 
 let controller = {

@@ -7,8 +7,8 @@ const port = process.env.PORT;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-const authRoutes = require("./src/routes/auth.routes");
 const userRoutes = require("./src/routes/user.routes");
+const authRoutes = require("./src/routes/auth.routes");
 const mealRoutes = require("./src/routes/meal.routes");
 const logger = require("./src/config/config").logger;
 
@@ -20,8 +20,8 @@ app.all("*", (req, res, next) => {
 });
 
 // All specific routes.
-app.use(authRoutes);
 app.use(userRoutes);
+app.use(authRoutes);
 app.use(mealRoutes);
 
 // Gives error that route doesn't exist.
