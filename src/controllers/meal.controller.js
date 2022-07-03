@@ -46,7 +46,7 @@ let controller = {
     let meal = req.body;
     let cookId = req.userId;
     let allergenes = req.body.allergenes.join();
-    let price = parseFloat(meal.price);
+    // let price = parseFloat(meal.price);
 
     logger.debug(meal);
     logger.debug(
@@ -56,7 +56,7 @@ let controller = {
       meal.isToTakeHome,
       meal.dateTime,
       meal.maxAmountOfParticipants,
-      price,
+      meal.price,
       meal.imageUrl,
       cookId,
       meal.name,
@@ -76,7 +76,7 @@ let controller = {
           meal.isToTakeHome,
           meal.dateTime,
           meal.maxAmountOfParticipants,
-          price,
+          meal.price,
           meal.imageUrl,
           cookId,
           meal.name,
@@ -122,7 +122,6 @@ let controller = {
               });
             }
           );
-          // }
         }
       );
     });
