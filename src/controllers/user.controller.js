@@ -45,6 +45,8 @@ let controller = {
 
       next();
     } catch (err) {
+      logger.error('The phonenumber was not correct.');
+
       const error = {
         status: 400,
         message: err.message,
@@ -103,22 +105,25 @@ let controller = {
   //UC-202 - Bekijken van alle gebruikers.
   getAllUsers: (req, res) => {
     logger.info('getAllUsers called');
+    const { isActive, firstName } = req.query;
+    logger.info('Query parameters: ' + isActive + ' ' + firstName);
 
-    let inputForQuery = req.query;
-    logger.debug(inputForQuery);
-    let { firstName, isActive } = req.query;
+    try {
+      if (isActive == 'false') {
+        isActive = 0;
+      } else {
+        isActive = 1;
+      }
+    } catch (err) {}
 
-    //Als er isActive en firstName is gegeven.
-    if (isActive != undefined && firstName != undefined) {
+    if (isActive && firstName) {
       queryString = `SELECT * FROM user WHERE firstName = '${firstName}' AND isActive = '${isActive}';`;
-      //
-      //Als er geen isActive maar wel firstName is gegeven.
-    } else if (isActive != undefined && firstName == undefined) {
+    } else if (firstName) {
+      queryString = `SELECT * FROM user WHERE firstName = '${firstName}';`;
+    } else if (isActive) {
       queryString = `SELECT * FROM user WHERE isActive = ${isActive};`;
-      //
-      //Als er wel isActive maar geen firstName is gegeven.
     } else {
-      queryString = `SELECT * FROM user WHERE firstName = ${firstName};`;
+      queryString = `SELECT * FROM user;`;
     }
 
     dbconnection.getConnection(function (err, connection) {
@@ -128,7 +133,7 @@ let controller = {
         if (error) {
           res.status(404).json({
             status: 404,
-            message: 'Could not found users.',
+            message: 'Could not find users.',
           });
         } else {
           logger.debug('Found all the users with getAllUsers.');
