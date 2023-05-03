@@ -1,5 +1,5 @@
-const mysql = require("mysql");
-require("dotenv").config();
+const mysql = require('mysql');
+require('dotenv').config();
 
 var pool = mysql.createPool({
   connectionLimit: 10,
@@ -12,10 +12,10 @@ var pool = mysql.createPool({
 
 module.exports = pool;
 
-pool.on("acquire", function (connection) {
-  console.log("Connection %d acquired", connection.threadId);
+pool.on('acquire', function (connection) {
+  console.log('Connection %d acquired', connection.threadId);
 });
 
-pool.on("release", function (connection) {
-  console.log("Connection %d released", connection.threadId);
+pool.on('release', function (connection) {
+  console.log('Connection %d released', connection.threadId);
 });
