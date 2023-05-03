@@ -1,6 +1,6 @@
 {
   "name": "programmeren-4-shareameal-server",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Programmeren 4 SAM server",
   "main": "index.js",
   "scripts": {
@@ -8,13 +8,13 @@
     "dev": "nodemon index.js",
     "test": "mocha test/**/*.test.js"
   },
-  "author": "Timothy",
+  "author": "Timothy Borghouts",
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.3.6",
     "chai-http": "^4.3.0",
     "mocha": "^9.2.2",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.22"
   },
   "dependencies": {
     "dotenv": "^16.0.0",
