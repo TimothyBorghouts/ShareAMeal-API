@@ -1,6 +1,7 @@
 const dbconnection = require('../../database/dbconnection');
 const assert = require('assert');
 const logger = require('../config/config').logger;
+const jwtSecretKey = require('../config/config').jwtSecretKey;
 
 let controller = {
   validateUser: (req, res, next) => {
@@ -149,18 +150,29 @@ let controller = {
   //UC-203 - Het opvragen van een persoonlijk gebruikers profiel.
   getUserProfile: (req, res, next) => {
     logger.info('getUserProfile called');
+    let userId = req.userId;
 
-    const userId = req.userId;
+    logger.info('Profile retrieved with userId ' + userId);
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      connection.query('SELECT * FROM user WHERE id = ?;', [userId], function (error, results, fields) {
+      connection.query('SELECT * FROM user WHERE id = ?;', [userId], function (error, result, fields) {
         connection.release();
 
-        res.status(200).json({
-          status: 200,
-          result: results[0],
-        });
+        if (result.length < 1) {
+          logger.info('No user with ' + userId + ' found');
+          res.status(404).json({
+            statusCode: 404,
+            message: `No user with ${userId} found`,
+          });
+        } else {
+          logger.info('User found with id ' + userId);
+          let user = result;
+          res.status(200).json({
+            status: 200,
+            result: result,
+          });
+        }
       });
     });
   },

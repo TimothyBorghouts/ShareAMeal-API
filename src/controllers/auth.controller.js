@@ -36,10 +36,11 @@ let controller = {
             });
           }
 
+          const user = results[0];
+
           //Kijken of het paswoord bestaat en of er wel een password is ingevoerd.
           if (rows && rows.length === 1 && rows[0].password == req.body.password) {
             logger.info('password is correct.');
-            user = rows[0];
 
             if (user.isActive) {
               user.isActive = true;
@@ -47,9 +48,8 @@ let controller = {
               user.isActive = false;
             }
 
-            const { password, ...userinfo } = rows[0];
-            const payload = {
-              userId: userinfo.id,
+            payload = {
+              userid: user.id,
             };
 
             //email en wachtwoord zijn correct dus we geven het token terug.
@@ -102,9 +102,8 @@ let controller = {
   validateToken(req, res, next) {
     logger.info('ValidateToken called');
     const authHeader = req.headers.authorization;
-
     if (!authHeader) {
-      logger.error('no authorization header!');
+      logger.error('no authorization header');
       res.status(401).json({
         status: '401',
         message: 'No authorization header',
@@ -121,10 +120,10 @@ let controller = {
           });
         }
         if (payload) {
-          logger.debug('token is valid', payload);
+          logger.info('token is valid', payload);
           // User heeft toegang. Voeg UserId uit payload toe aan request, voor ieder volgend endpoint.
-          req.userId = payload.userid;
-          logger.info('userId = ', payload.userid);
+          req.userId = payload.userId;
+          logger.info('userId = ', payload.userId);
           next();
         }
       });
