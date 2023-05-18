@@ -5,7 +5,7 @@ const logger = require('../config/config').logger;
 let controller = {
   validateMeal: (req, res, next) => {
     let meal = req.body;
-    let { name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, price } = meal;
+    let { name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, maxAmountOfParticipants, price } = meal;
 
     try {
       assert(typeof name === 'string', 'Name must be a string');
@@ -15,8 +15,9 @@ let controller = {
       assert(isVegan != null, 'isVegan is invalid');
       assert(isToTakeHome != null, 'isToTakeHome is invalid');
       assert(typeof dateTime === 'string', 'DateTime must be a string');
-      assert(typeof imageUrl === 'string', 'Image url must be a string');
+      assert(typeof maxAmountOfParticipants === 'number', 'maxAmountOfParticipants must be a number');
       assert(typeof price === 'number', 'Price must be a number');
+      assert(typeof imageUrl === 'string', 'Image url must be a string');
 
       next();
     } catch (err) {
@@ -29,21 +30,22 @@ let controller = {
     }
   },
 
-  //UC-301 - Toevoegen van een maaltijd.
+  //UC-301 - Toevoegen van maaltijd
   addMeal: (req, res, next) => {
     logger.info('addMeal called');
 
     let meal = req.body;
-    let cookId = req.userId;
     let allergenes = req.body.allergenes.join();
-    // let price = parseFloat(meal.price);
+    let cook = req.userId;
+    let price = parseFloat(meal.price);
+    const createDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
       connection.query(
-        `INSERT INTO meal ( isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, name, description, allergenes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);`,
-        [meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, meal.price, meal.imageUrl, cookId, meal.name, meal.description, allergenes],
+        'INSERT INTO meal (`name`, `description`,`isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
+        [meal.name, meal.description, meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, price, meal.imageUrl, cook, allergenes, date, date],
         function (error, results, fields) {
           if (error) throw error;
           connection.query(`SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;`, function (error, results, fields) {
@@ -86,7 +88,7 @@ let controller = {
     });
   },
 
-  //UC-302 - Verander een specifieke maaltijd.
+  //UC-302 - Wijzigen van maaltijdgegevens
   updateMealById: (req, res) => {
     logger.info('updateMealById called');
 
@@ -127,7 +129,7 @@ let controller = {
     });
   },
 
-  //UC-303 - Bekijken van alle maaltijden.
+  //UC-303 - Opvragen van alle maaltijden
   getAllMeals: (req, res) => {
     logger.info('getAllMeals called');
 
@@ -147,7 +149,7 @@ let controller = {
     });
   },
 
-  //UC-304 - Een specifieke maaltijd opvragen.
+  //UC-304 - Opvragen van maaltijd bij ID
   getMealById: (req, res) => {
     logger.info('getMealById called');
 
@@ -187,7 +189,7 @@ let controller = {
     });
   },
 
-  //UC-305 - Verwijder een maaltijd.
+  //UC-305 - Verwijderen van maaltijd
   deleteMealById: (req, res) => {
     logger.info('deleteMealById called');
 
