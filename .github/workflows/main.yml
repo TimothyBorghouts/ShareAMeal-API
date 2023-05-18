@@ -1,4 +1,4 @@
-name: Deploy to Heroku
+name: Railway deployment
 
 on:
   push:
@@ -6,48 +6,60 @@ on:
       - main
 
 jobs:
-  # integrationtests:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     MYSQL_ROOT_PASSWORD: root # default root password to use must be 'root'
-  #     DB_HOST: localhost
-  #     DB_PORT: 3306
-  #     DB_DATABASE: share_a_meal
-  #     DB_USER: root
-  #     DB_PASSWORD: root
-  #   services:
-  #     mysql:
-  #       image: mysql:5.7
-  #       ports:
-  #         - 3306
-  #   steps:
-  #     - uses: actions/checkout@v2
+  integrationtests:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_ROOT_PASSWORD: root
+      DB_HOST: '127.0.0.1'
+      DB_PORT: '3306'
+      DB_DATABASE: share_a_meal
+      DB_USER: root
+      DB_PASSWORD: root
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - '3306'
+    steps:
+      - uses: actions/checkout@main
 
-  #     - name: Start MySQL connection from host
-  #       run: |
-  #         sudo /etc/init.d/mysql start
-  #         sudo apt-get install -y mysql-client
-  #         mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
-  #         mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.DB_DATABASE}};"
-  #     - name: Import the database
-  #       run: |
-  #         mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} < share-a-meal.sql
-  #         mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} -e "SHOW TABLES;"
-  #     - name: npm install
-  #       run: |
-  #         npm install
-  #     - name: npm test
-  #       run: |
-  #         npm test -- --DB_PASSWORD $MYSQL_ROOT_PASSWORD --DB_USER root --DB_NAME $DB_DATABASE
-  deploy:
-    # needs: integrationtests
+      - name: Start MySQL connection from host
+        run: |
+          sudo /etc/init.d/mysql start
+          sudo apt-get install -y mysql-client
+          mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
+          mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.DB_DATABASE}};"
+
+      - name: Import database script
+        run: |
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} < share-a-meal.sql
+          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} -e "SHOW TABLES;"
+
+      - name: npm install
+        run: |
+          npm install
+
+      - name: npm test
+        run: |
+          npm test -- --DB_PASSWORD {{env.MYSQL_ROOT_PASSWORD}} --DB_USER root --DB_NAME ${{env.DB_DATABASE}}
+
+  Railway-deploy:
+    needs: integrationtests
     runs-on: ubuntu-latest
     environment:
-      name: Heroku # naam van mijn environment op GitHub
+      name: Railway
     steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: share-a-meal-timothy-borghouts
-          heroku_email: timothy.borghouts2@gmail.com
+      - name: Clone repository
+        uses: actions/checkout@main
+
+      - name: 'Current token'
+        run: |
+          echo "secrets.RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}"
+
+      - name: Install Railway
+        run: npm i -g @railway/cli
+
+      - name: Deploy server to Railway
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
