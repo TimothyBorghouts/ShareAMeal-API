@@ -1,5 +1,6 @@
 const assert = require('assert');
 const dbconnection = require('../../database/dbconnection');
+const { log } = require('console');
 const logger = require('../config/config').logger;
 
 let controller = {
@@ -35,16 +36,16 @@ let controller = {
     logger.info('addMeal called');
 
     let meal = req.body;
-    let allergenes = req.body.allergenes.join();
+    allergenes = '';
     let cook = req.userId;
     let price = parseFloat(meal.price);
-    const createDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
       connection.query(
-        'INSERT INTO meal (`name`, `description`,`isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
+        'INSERT INTO meal (`name`, `description`,`isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `allergenes`, `createDate`, `updateDate`) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
         [meal.name, meal.description, meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, price, meal.imageUrl, cook, allergenes, date, date],
         function (error, results, fields) {
           if (error) throw error;
@@ -92,7 +93,7 @@ let controller = {
   updateMealById: (req, res) => {
     logger.info('updateMealById called');
 
-    const mealId = req.params.userId;
+    const mealId = req.params.mealId;
     logger.debug(mealId);
     let meal = req.body;
     logger.debug(meal);
