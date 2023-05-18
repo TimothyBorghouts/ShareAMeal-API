@@ -83,7 +83,7 @@ let controller = {
     logger.info('ValidateLogin called');
 
     try {
-      assert(typeof req.body.emailAdress === 'string email must be a string.');
+      assert(typeof req.body.emailAdress === 'string', 'string email must be a string.');
       assert(typeof req.body.password === 'string', 'password must be a string.');
       assert.match(req.body.emailAdress, /.+\@.+\..+/, 'This is not an correct email address.');
       assert.match(req.body.password, /([0-9a-zA-Z]{8,})/, 'This is not an correct password.');
