@@ -36,24 +36,24 @@ let controller = {
             });
           }
 
-          const user = results[0];
-
           //Kijken of het paswoord bestaat en of er wel een password is ingevoerd.
           if (rows && rows.length === 1 && rows[0].password == req.body.password) {
             logger.info('password is correct.');
 
-            if (user.isActive) {
-              user.isActive = true;
+            const { password, ...userinfo } = rows[0];
+
+            if (userinfo.isActive) {
+              userinfo.isActive = true;
             } else {
-              user.isActive = false;
+              userinfo.isActive = false;
             }
 
             payload = {
-              userid: user.id,
+              userId: userinfo.id,
             };
 
             //email en wachtwoord zijn correct dus we geven het token terug.
-            jwt.sign(payload, jwtSecretKey, { expiresIn: '10d' }, function (err, token) {
+            jwt.sign(payload, jwtSecretKey, { expiresIn: '24d' }, function (err, token) {
               logger.info('User succesfully logged in: ' + token);
               res.status(200).json({
                 status: 200,
