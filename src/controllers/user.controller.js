@@ -236,8 +236,8 @@ let controller = {
         } else {
           logger.debug('User was not found with updateUserById.');
           connection.release();
-          res.status(400).json({
-            status: 400,
+          res.status(404).json({
+            status: 404,
             message: 'User with Id: ' + userId + ' does not exist',
           });
         }
