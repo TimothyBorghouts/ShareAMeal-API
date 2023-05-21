@@ -7,7 +7,7 @@ const jwtSecretKey = require('../config/config').jwtSecretKey;
 const queryString = 'SELECT * FROM `user` WHERE `emailAdress` = ?';
 
 let controller = {
-  //UC-101 - Inloggen als gebruiker met email en wachtwoord.
+  //UC-101 - Inloggen
   login(req, res, next) {
     logger.info('login is called');
 
@@ -128,6 +128,20 @@ let controller = {
         }
       });
     }
+  },
+
+  //UC-102 - Opvragen van systeeminformatie
+  info(req, res, next) {
+    logger.info('Get server information');
+    res.status(201).json({
+      status: 201,
+      message: 'Share a Meal API',
+      data: {
+        studentName: 'Timothy Borghouts',
+        studentNumber: 2182610,
+        description: 'Dit is de Share a Meal API van Timothy Borghouts',
+      },
+    });
   },
 };
 
