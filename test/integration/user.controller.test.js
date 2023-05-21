@@ -33,7 +33,7 @@ describe('Testing User', () => {
     logger.info('Before done');
   });
 
-  //UC-201 Registreren als nieuwe user
+  //TC-201 Registreren als nieuwe user
   describe('TC-201 Registreren als nieuwe user', () => {
     beforeEach((done) => {
       dbconnection.getConnection(function (err, connection) {

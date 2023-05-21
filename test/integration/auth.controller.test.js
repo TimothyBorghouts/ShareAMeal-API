@@ -29,7 +29,7 @@ describe('Testing Auth', () => {
     logger.info('Before done');
   });
 
-  //UC-101 Inloggen
+  //TC-101 Inloggen
   describe('TC-101 Inloggen', () => {
     beforeEach((done) => {
       dbconnection.getConnection(function (err, connection) {

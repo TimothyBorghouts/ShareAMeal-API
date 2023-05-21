@@ -10,7 +10,7 @@ let controller = {
 
     try {
       assert(typeof name === 'string', 'Name must be a string');
-      assert(typeof description === 'string', 'Description must be a string!');
+      assert(typeof description === 'string', 'Description must be a string');
       assert(isActive != null, 'isActive is invalid');
       assert(isVega != null, 'isVega is invalid');
       assert(isVegan != null, 'isVegan is invalid');
