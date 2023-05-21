@@ -10,6 +10,8 @@ app.use(bodyParser.json());
 const userRoutes = require('./src/routes/user.routes');
 const authRoutes = require('./src/routes/auth.routes');
 const mealRoutes = require('./src/routes/meal.routes');
+const participateRoutes = require('./src/routes/participate.routes');
+
 const logger = require('./src/config/config').logger;
 
 //Logs the request from the user.
@@ -23,6 +25,7 @@ app.all('*', (req, res, next) => {
 app.use(userRoutes);
 app.use(authRoutes);
 app.use(mealRoutes);
+app.use(participateRoutes);
 
 // Gives error that route doesn't exist.
 app.all('*', (req, res) => {
