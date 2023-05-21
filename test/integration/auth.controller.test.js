@@ -53,7 +53,7 @@ describe('Testing Auth', () => {
     it('TC-101-1 Verplicht veld ontbreekt', (done) => {
       chai
         .request(server)
-        .post('/api/auth/login')
+        .post('/api/login')
         .send({
           emailAdress: 'timothy.borghouts@gmail.com',
         })
@@ -70,7 +70,7 @@ describe('Testing Auth', () => {
     it('TC-101-2 Niet-valide wachtwoord', (done) => {
       chai
         .request(server)
-        .post('/api/auth/login')
+        .post('/api/login')
         .send({
           emailAdress: 'timothy.borghouts@gmail.com',
           password: 'jajaja321',
@@ -78,7 +78,7 @@ describe('Testing Auth', () => {
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
-          status.should.equals(404);
+          status.should.equals(400);
           message.should.be.a('string').that.contains('Email or password is incorrect');
           done();
         });
@@ -88,7 +88,7 @@ describe('Testing Auth', () => {
     it('TC-101-3 Gebruiker bestaat niet', (done) => {
       chai
         .request(server)
-        .post('/api/auth/login')
+        .post('/api/login')
         .send({
           emailAdress: 'bob.isgrappig@gmail.com',
           password: 'jajaja123',
@@ -96,7 +96,7 @@ describe('Testing Auth', () => {
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
-          status.should.equals(404);
+          status.should.equals(400);
           message.should.be.a('string').that.contains('Email or password is incorrect');
           done();
         });
@@ -106,7 +106,7 @@ describe('Testing Auth', () => {
     it('TC-101-4 Gebruiker succesvol ingelogd', (done) => {
       chai
         .request(server)
-        .post('/api/auth/login')
+        .post('/api/login')
         .send({
           emailAdress: 'timothy.borghouts@gmail.com',
           password: 'jajaja123',

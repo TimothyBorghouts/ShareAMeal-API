@@ -33,6 +33,9 @@ let controller = {
             res.status(404).json({
               status: 404,
               message: 'User does not exist.',
+              data: {
+                error: 'User does not exist',
+              },
             });
           }
 
@@ -57,6 +60,7 @@ let controller = {
               logger.info('User succesfully logged in: ' + token);
               res.status(200).json({
                 status: 200,
+                message: 'Succesfully logged in',
                 result: { ...userinfo, token },
               });
             });
@@ -64,9 +68,12 @@ let controller = {
             //email en wachtwoord zijn incorrect dus we geven een error terug.
           } else {
             logger.debug('Email or password is incorrect or does not exist.');
-            res.status(404).json({
-              status: 404,
+            res.status(400).json({
+              status: 400,
               message: 'Email or password is incorrect or does not exist.',
+              data: {
+                error: 'Email or password is incorrect or does not exist.',
+              },
             });
           }
         });
@@ -94,6 +101,9 @@ let controller = {
       res.status(400).json({
         status: 400,
         message: err.toString(),
+        data: {
+          error: 'emailAdress or password was incorrect',
+        },
       });
     }
   },
@@ -105,7 +115,7 @@ let controller = {
     if (!authHeader) {
       logger.error('no authorization header');
       res.status(401).json({
-        status: '401',
+        status: 401,
         message: 'No authorization header',
       });
     } else {
@@ -133,8 +143,8 @@ let controller = {
   //UC-102 - Opvragen van systeeminformatie
   info(req, res, next) {
     logger.info('Get server information');
-    res.status(201).json({
-      status: 201,
+    res.status(200).json({
+      status: 200,
       message: 'Share a Meal API',
       data: {
         studentName: 'Timothy Borghouts',
