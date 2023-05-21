@@ -4,12 +4,55 @@ const { log } = require('console');
 const logger = require('../config/config').logger;
 
 let controller = {
+  checkIfMealExists: (req, res, next) => {
+    logger.info('checkIfMealExists called');
+    const mealId = parseInt(req.params.mealId);
+
+    dbconnection.getConnection((err, connection) => {
+      if (err) {
+        throw err;
+      }
+      connection.query('SELECT * FROM meal WHERE id = ?;', [mealId], (err, results, fields) => {
+        connection.release();
+        if (results.length !== 0) {
+          next();
+        } else {
+          const err = {
+            status: 404,
+            message: 'Maaltijd met ID ' + mealId + ' bestaat niet',
+          };
+          next(err);
+        }
+      });
+    });
+  },
+
+  checkIfParticipateExists: (req, res, next) => {
+    logger.info('checkIfParticipateExists called');
+    const mealId = parseInt(req.params.mealId);
+
+    dbconnection.getConnection((err, connection) => {
+      connection.query('SELECT * FROM meal_participants_user WHERE mealId = ?;', [mealId], (err, results, fields) => {
+        connection.release();
+        if (results.length !== 0) {
+          next();
+        } else {
+          const err = {
+            status: 404,
+            message: `Aanmelding bestaat niet`,
+          };
+          next(err);
+        }
+      });
+    });
+  },
+
   //UC-401 Aanmelden voor maaltijd
   participateToMeal: (req, res) => {
     logger.info('participateToMeal called');
 
     let userId = req.userId;
-    const mealId = parseInt(req.params.mealId);
+    const mealId = req.params.mealId;
 
     dbconnection.getConnection((err, connection) => {
       connection.query('INSERT INTO meal_participants_user (mealId, userId) VALUES(?, ?);', [mealId, userId], (error, results, fields) => {
@@ -24,7 +67,7 @@ let controller = {
         } else {
           res.status(200).json({
             status: 200,
-            result: results,
+            message: 'succesvol aangemeld',
           });
         }
       });
@@ -36,14 +79,14 @@ let controller = {
     logger.info('participateLeaveMeal called');
 
     let userId = req.userId;
-    const mealId = parseInt(req.params.mealId);
+    const mealId = req.params.mealId;
 
     dbconnection.getConnection((err, connection) => {
       connection.query('DELETE FROM meal_participants_user WHERE mealId = ? AND userId = ?;', [mealId, userId], (error, results, fields) => {
         connection.release();
         res.status(200).json({
           status: 200,
-          result: results,
+          result: 'succesvol afgemeld',
         });
       });
     });
@@ -70,15 +113,17 @@ let controller = {
   getParticipantsDetails: (req, res) => {
     logger.info('getParticipantsDetails called');
 
-    const userId = parseInt(req.params.userId);
-    const mealId = parseInt(req.params.mealId);
+    const userId = req.params.userId;
+    const mealId = req.params.mealId;
 
     dbconnection.getConnection((err, connection) => {
-      connection.query('SELECT * FROM meal_participants_user WHERE mealId = ?;', [mealId], (error, results, fields) => {
-        connection.release();
-        res.status(200).json({
-          status: 200,
-          result: results,
+      connection.query('SELECT userId FROM meal_participants_user WHERE mealId = ?;', [mealId], (err, results, fields) => {
+        connection.query('SELECT * FROM user WHERE userId = ?;', [userId], (err, results, fields) => {
+          connection.release();
+          res.status(200).json({
+            status: 200,
+            result: results,
+          });
         });
       });
     });

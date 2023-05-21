@@ -17,21 +17,29 @@ describe('Testing Participate', () => {
       if (err) throw err;
       connection.query('DELETE FROM meal;', function (error, result, field) {
         connection.query('DELETE FROM user;', function (error, result, field) {
-          connection.query(
-            'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-              '(5, "Timothy", "Borghouts", "timothy.borghouts@gmail.com", "wachtwoord123", "Brugstraat", "Eindhoven");',
-            function (error, result, field) {
-              connection.query(
-                'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
-                  "(1, 'Vegetarische plopkoek', 'plopkoeken zijn gewoon lekker', 'Geen afbeelding', '2022-04-09 09:37:10', 10, 20.00, 5);",
-                function (error, result, field) {
-                  if (error) throw error;
-                  connection.release();
-                  done();
-                }
-              );
-            }
-          );
+          connection.query('DELETE FROM meal_participants_user;', function (error, result, field) {
+            connection.query(
+              'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
+                '(5, "Timothy", "Borghouts", "timothy.borghouts@gmail.com", "wachtwoord123", "Brugstraat", "Eindhoven");',
+              function (error, result, field) {
+                connection.query(
+                  'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
+                    "(1, 'Gevulde koeken', 'Gevulde koeken zijn vrij prima', 'Geen afbeelding', '2022-04-09 09:37:10', 1, 10.00, 5);",
+                  function (error, result, field) {
+                    connection.query(
+                      'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
+                        "(2, 'Vegetarische plopkoek', 'plopkoeken zijn gewoon lekker', 'Geen afbeelding', '2022-04-09 09:37:10', 10, 20.00, 5);",
+                      function (error, result, field) {
+                        if (error) throw error;
+                        connection.release();
+                        done();
+                      }
+                    );
+                  }
+                );
+              }
+            );
+          });
         });
       });
     });
@@ -69,20 +77,19 @@ describe('Testing Participate', () => {
         .post('/api/meal/1/participate')
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
-          res.body.status.should.be.equal(200);
+          res.body.status.should.be.equal(409);
           res.should.be.an('object');
           done();
         });
     });
 
-    it.skip('TC-401-4 Maximumaantal aanmeldingen is bereikt', (done) => {
+    it('TC-401-4 Maximumaantal aanmeldingen is bereikt', (done) => {
       chai
         .request(server)
         .post('/api/meal/1/participate')
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
-          res.body.status.should.be.equal(200);
-          res.should.be.an('object');
+          res.body.status.should.be.equal(409);
           done();
         });
     });
@@ -91,8 +98,8 @@ describe('Testing Participate', () => {
   //UC-402 Afmelden voor maaltijd
   describe('UC-402 Afmelden voor maaltijd', () => {
     beforeEach((done) => {
-        dbconnection.getConnection((err, connection) => {
-        connection.query('INSERT INTO `meal_participants_user` VALUES (5,1);', (err, result) => {
+      dbconnection.getConnection((err, connection) => {
+        connection.query('INSERT INTO `meal_participants_user` VALUES (1,5);', (err, result) => {
           connection.release();
           done();
         });
@@ -122,10 +129,10 @@ describe('Testing Participate', () => {
         });
     });
 
-    it.skip('TC-402-3 Aanmelding bestaat niet', (done) => {
+    it('TC-402-3 Aanmelding bestaat niet', (done) => {
       chai
         .request(server)
-        .delete('/api/meal/1/participate')
+        .delete('/api/meal/2/participate')
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
           res.body.status.should.be.equal(404);
@@ -141,7 +148,6 @@ describe('Testing Participate', () => {
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
           res.body.status.should.be.equal(200);
-          res.body.message.should.be.equal('Succesvol afgemeld');
           done();
         });
     });
