@@ -1,10 +1,9 @@
 const assert = require('assert');
 const dbconnection = require('../../database/dbconnection');
-const jwt = require('jsonwebtoken');
 const logger = require('../config/config').logger;
+const jwt = require('jsonwebtoken');
 const jwtSecretKey = require('../config/config').jwtSecretKey;
-
-const queryString = 'SELECT * FROM `user` WHERE `emailAdress` = ?';
+const bcrypt = require('bcrypt');
 
 let controller = {
   //UC-101 - Inloggen
@@ -24,7 +23,7 @@ let controller = {
       if (connection) {
         logger.info('Succesfully connected to database');
 
-        connection.query(queryString, [req.body.emailAdress], (err, rows, fields) => {
+        connection.query('SELECT * FROM `user` WHERE `emailAdress` = ?', [req.body.emailAdress], (err, rows, fields) => {
           connection.release();
           //User with that emailAdress does not exist.
           if (err) {
@@ -39,41 +38,45 @@ let controller = {
             });
           }
 
-          //Kijken of het paswoord bestaat en of er wel een password is ingevoerd.
-          if (rows && rows.length === 1 && rows[0].password == req.body.password) {
-            logger.info('password is correct.');
+          //Kijken of het wachtwoord bestaat en of er wel een wachtwoord is ingevoerd.
+          if (rows && rows.length === 1) {
+            //Kijken of de het wachtwoord klopt met bcrypt
+            bcrypt.compare(req.body.password, rows[0].password, function (err, result) {
+              if (result == true) {
+                logger.info('password is correct.');
 
-            const { password, ...userinfo } = rows[0];
+                const { password, ...userinfo } = rows[0];
 
-            if (userinfo.isActive) {
-              userinfo.isActive = true;
-            } else {
-              userinfo.isActive = false;
-            }
+                if (userinfo.isActive) {
+                  userinfo.isActive = true;
+                } else {
+                  userinfo.isActive = false;
+                }
 
-            payload = {
-              userId: userinfo.id,
-            };
+                payload = {
+                  userId: userinfo.id,
+                };
 
-            //email en wachtwoord zijn correct dus we geven het token terug.
-            jwt.sign(payload, jwtSecretKey, { expiresIn: '24d' }, function (err, token) {
-              logger.info('User succesfully logged in: ' + token);
-              res.status(200).json({
-                status: 200,
-                message: 'Succesfully logged in',
-                result: { ...userinfo, token },
-              });
-            });
-
-            //email en wachtwoord zijn incorrect dus we geven een error terug.
-          } else {
-            logger.debug('Email or password is incorrect or does not exist.');
-            res.status(400).json({
-              status: 400,
-              message: 'Email or password is incorrect or does not exist.',
-              data: {
-                error: 'Email or password is incorrect or does not exist.',
-              },
+                //email en wachtwoord zijn correct dus we geven het token terug.
+                jwt.sign(payload, jwtSecretKey, { expiresIn: '24d' }, function (err, token) {
+                  logger.info('User succesfully logged in: ' + token);
+                  res.status(200).json({
+                    status: 200,
+                    message: 'Succesfully logged in',
+                    result: { ...userinfo, token },
+                  });
+                });
+                //email en wachtwoord zijn incorrect dus we geven een error terug.
+              } else {
+                logger.debug('Email or password is incorrect or does not exist.');
+                res.status(400).json({
+                  status: 400,
+                  message: 'Email or password is incorrect or does not exist.',
+                  data: {
+                    error: 'Email or password is incorrect or does not exist.',
+                  },
+                });
+              }
             });
           }
         });

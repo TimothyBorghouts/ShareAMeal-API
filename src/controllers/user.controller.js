@@ -2,6 +2,7 @@ const dbconnection = require('../../database/dbconnection');
 const assert = require('assert');
 const logger = require('../config/config').logger;
 const jwtSecretKey = require('../config/config').jwtSecretKey;
+const bcrypt = require('bcrypt');
 
 let controller = {
   validateUser: (req, res, next) => {
@@ -63,43 +64,46 @@ let controller = {
     let user = req.body;
     logger.debug(user);
 
-    dbconnection.getConnection(function (err, connection) {
-      if (err) throw err;
+    //Hash het wachtwoord zodat het niet meer herkenbaar is
+    bcrypt.hash(user.password, 10, function (err, hash) {
+      dbconnection.getConnection(function (err, connection) {
+        if (err) throw err;
 
-      connection.query(
-        `INSERT INTO user (firstName, lastName, emailAdress, password, phoneNumber, street, city) VALUES(?,?,?,?,?,?,?);`,
-        [user.firstName, user.lastName, user.emailAdress, user.password, user.phoneNumber, user.street, user.city],
-        function (err, results, fields) {
-          if (err) {
-            connection.release();
-            logger.debug('Could not add user to database, email alreadt exists.');
-
-            res.status(409).json({
-              status: 409,
-              message: 'User with email: ' + user.emailAdress + ' does already exist.',
-            });
-          } else {
-            connection.query(`SELECT * FROM user WHERE emailAdress = '${user.emailAdress}'`, function (error, results, fields) {
+        connection.query(
+          `INSERT INTO user (firstName, lastName, emailAdress, password, phoneNumber, street, city) VALUES(?,?,?,?,?,?,?);`,
+          [user.firstName, user.lastName, user.emailAdress, hash, user.phoneNumber, user.street, user.city],
+          function (err, results, fields) {
+            if (err) {
               connection.release();
+              logger.debug('Could not add user to database, email alreadt exists.');
 
-              if (error) throw error;
-
-              user = results[0];
-              if (user.isActive) {
-                user.isActive = true;
-              } else {
-                user.isActive = false;
-              }
-
-              logger.debug('Added user to database with addUser.');
-              res.status(201).json({
-                status: 201,
-                result: user,
+              res.status(409).json({
+                status: 409,
+                message: 'User with email: ' + user.emailAdress + ' does already exist.',
               });
-            });
+            } else {
+              connection.query(`SELECT * FROM user WHERE emailAdress = '${user.emailAdress}'`, function (error, results, fields) {
+                connection.release();
+
+                if (error) throw error;
+
+                user = results[0];
+                if (user.isActive) {
+                  user.isActive = true;
+                } else {
+                  user.isActive = false;
+                }
+
+                logger.debug('Added user to database with addUser.');
+                res.status(201).json({
+                  status: 201,
+                  result: user,
+                });
+              });
+            }
           }
-        }
-      );
+        );
+      });
     });
   },
 
@@ -212,35 +216,36 @@ let controller = {
     const userId = req.params.userId;
     let user = req.body;
     let { firstName, lastName, emailAdress, password, phonenumber, street, city } = user;
+    bcrypt.hash(user.password, 10, function (err, hash) {
+      dbconnection.getConnection(function (err, connection) {
+        if (err) throw err;
+        connection.query('SELECT * FROM user WHERE id = ' + userId, function (error, results, fields) {
+          if (error) throw error;
 
-    dbconnection.getConnection(function (err, connection) {
-      if (err) throw err;
-      connection.query('SELECT * FROM user WHERE id = ' + userId, function (error, results, fields) {
-        if (error) throw error;
+          if (results.length > 0) {
+            connection.query(
+              `UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, street = ?, city = ? WHERE id = ${userId}`,
+              [firstName, lastName, emailAdress, hash, street, city],
+              function (error, results, fields) {
+                connection.release();
+                if (error) throw error;
 
-        if (results.length > 0) {
-          connection.query(
-            `UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, street = ?, city = ? WHERE id = ${userId}`,
-            [firstName, lastName, emailAdress, password, street, city],
-            function (error, results, fields) {
-              connection.release();
-              if (error) throw error;
-
-              logger.debug('Updated user with updateUserById.');
-              res.status(200).json({
-                status: 200,
-                result: user,
-              });
-            }
-          );
-        } else {
-          logger.debug('User was not found with updateUserById.');
-          connection.release();
-          res.status(404).json({
-            status: 404,
-            message: 'User with Id: ' + userId + ' does not exist',
-          });
-        }
+                logger.debug('Updated user with updateUserById.');
+                res.status(200).json({
+                  status: 200,
+                  result: user,
+                });
+              }
+            );
+          } else {
+            logger.debug('User was not found with updateUserById.');
+            connection.release();
+            res.status(404).json({
+              status: 404,
+              message: 'User with Id: ' + userId + ' does not exist',
+            });
+          }
+        });
       });
     });
   },
