@@ -32,6 +32,7 @@ let controller = {
     const mealId = parseInt(req.params.mealId);
 
     dbconnection.getConnection((err, connection) => {
+      if (err) throw err;
       connection.query('SELECT * FROM meal_participants_user WHERE mealId = ?;', [mealId], (err, results, fields) => {
         connection.release();
         if (results.length !== 0) {
@@ -117,14 +118,23 @@ let controller = {
     const mealId = req.params.mealId;
 
     dbconnection.getConnection((err, connection) => {
-      connection.query('SELECT userId FROM meal_participants_user WHERE mealId = ?;', [mealId], (err, results, fields) => {
-        connection.query('SELECT * FROM user WHERE userId = ?;', [userId], (err, results, fields) => {
-          connection.release();
-          res.status(200).json({
-            status: 200,
-            result: results,
+      connection.query('SELECT * FROM meal_participants_user WHERE mealId = ?;', [mealId], (error, result, fields) => {
+        if (result.length > 0 && userId == result[0].userId) {
+          connection.query('SELECT * FROM user WHERE id = ?;', [userId], (err, result, fields) => {
+            if (err) throw err;
+            connection.release();
+            res.status(200).json({
+              status: 200,
+              result: result,
+            });
           });
-        });
+        } else {
+          connection.release();
+          res.status(404).json({
+            status: 404,
+            result: 'Participant not found.',
+          });
+        }
       });
     });
   },
