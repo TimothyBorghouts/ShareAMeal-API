@@ -9,7 +9,7 @@ const logger = require('../../src/config/config').logger;
 chai.should();
 chai.use(chaiHttp);
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYwLCJpYXQiOjE2ODQ0MDQ1NTEsImV4cCI6MTY4NjQ3ODE1MX0.xVplH8-s09lcOmlouqQvI2LThBWSOPRF1bH4pKnfVJc';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY4ODQxNzk0NSwiZXhwIjoxNjkwNDkxNTQ1fQ.ZHgrMDTbkV5TgzBkzp2dSpw1sggkQrNyVnaKydk7zNo';
 
 describe('Testing Participate', () => {
   before((done) => {

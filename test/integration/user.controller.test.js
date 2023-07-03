@@ -11,7 +11,7 @@ chai.should();
 chai.use(chaiHttp);
 
 //Tokens die even nodig is om mee te kunnen testen. Éen is correct en de ander incorrect.
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYwLCJpYXQiOjE2ODQ0MDQ1NTEsImV4cCI6MTY4NjQ3ODE1MX0.xVplH8-s09lcOmlouqQvI2LThBWSOPRF1bH4pKnfVJc';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY4ODQxNzk0NSwiZXhwIjoxNjkwNDkxNTQ1fQ.ZHgrMDTbkV5TgzBkzp2dSpw1sggkQrNyVnaKydk7zNo';
 const incorrectToken = 'dyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYwLCJpYXQiOjE2ODQ0MDQ1NTEsImV4cCI6MTY4NjQ3ODE1MX0.xVplH8-s09lcOmlouqQvI2LThBWSOPRF1bH4pKnfVJc';
 
 describe('Testing User', () => {
