@@ -10,94 +10,97 @@ let controller = {
   login(req, res, next) {
     logger.info('login is called');
 
-      dbconnection.getConnection((err, connection) => {
-        if (err) {
-          logger.error('No connection from dbconnection.');
-          res.status(500).json({
-            status: 500,
-            message: err.toString(),
-          });
-        }
+    dbconnection.getConnection((err, connection) => {
+      if (err) {
+        logger.error('No connection from dbconnection.');
+        res.status(500).json({
+          status: 500,
+          message: err.toString(),
+        });
+      }
 
-        //dbconnection is succesfully connected
-        if (connection) {
-          logger.info('Succesfully connected to database');
+      //dbconnection is succesfully connected
+      if (connection) {
+        logger.info('Succesfully connected to database');
 
-          connection.query('SELECT * FROM `user` WHERE `emailAdress` = ?', [req.body.emailAdress], (err, rows, fields) => {
-            //User with that emailAdress does not exist.
-            if (err) {
-              connection.release();
-              logger.debug('User does not exist');
-              res.status(404).json({
-                status: 404,
-                message: 'User does not exist.',
-                data: {
-                  error: 'User does not exist',
-                },
-              });
-            }
+        connection.query('SELECT * FROM `user` WHERE `emailAdress` = ?', [req.body.emailAdress], (err, rows, fields) => {
+          //User with that emailAdress does not exist.
+          if (err) {
+            connection.release();
+            logger.debug('User does not exist');
+            res.status(404).json({
+              status: 404,
+              message: 'User does not exist.',
+              data: {
+                error: 'User does not exist',
+              },
+            });
+          }
 
-            logger.info(rows);
-            logger.info(rows[0]);
+          logger.info(rows);
+          logger.info(rows[0]);
 
-            logger.info('hello2');
-            //Kijken of het wachtwoord bestaat en of er wel een wachtwoord is ingevoerd.
-            if (rows.length > 0) {
-              logger.info('hello3');
-              //Kijken of de het wachtwoord klopt met bcrypt
-              bcrypt.compare(req.body.password, rows[0].password, function (err, result) {
-                logger.info('hello4');
-                if (result == true) {
-                  logger.info('password is correct.');
+          logger.info('hello2');
+          //Kijken of het wachtwoord bestaat en of er wel een wachtwoord is ingevoerd.
+          if (rows.length > 0) {
+            logger.info('hello3');
+            //Kijken of de het wachtwoord klopt met bcrypt
+            bcrypt.compare(req.body.password, rows[0].password, function (err, result) {
+              logger.info('hello4');
+              if (result == true) {
+                logger.info('password is correct.');
 
-                  const { password, ...userinfo } = rows[0];
+                const { password, ...userinfo } = rows[0];
 
-                  if (userinfo.isActive) {
-                    userinfo.isActive = true;
-                  } else {
-                    userinfo.isActive = false;
-                  }
-
-                  payload = {
-                    userId: userinfo.id,
-                  };
-
-                  //email en wachtwoord zijn correct dus we geven het token terug.
-                  jwt.sign(payload, jwtSecretKey, { expiresIn: '24d' }, function (err, token) {
-                    logger.info('User succesfully logged in: ' + token);
-                    res.status(200).json({
-                      status: 200,
-                      message: 'Succesfully logged in',
-                      result: { ...userinfo, token },
-                    });
-                  });
-                  //email en wachtwoord zijn incorrect dus we geven een error terug.
+                if (userinfo.isActive) {
+                  userinfo.isActive = true;
                 } else {
-                  logger.debug('Email or password is incorrect or does not exist.');
-                  res.status(400).json({
-                    status: 400,
-                    message: 'Email or password is incorrect or does not exist.',
-                    data: {
-                      error: 'Email or password is incorrect or does not exist.',
-                    },
-                  });
+                  userinfo.isActive = false;
                 }
-              });
-            } else {
-              logger.debug('No user found');
-            }
-          });
 
-          //dbconnection is not connected
-        } else {
-          logger.info('No connection with database.');
-        }
-      });
+                payload = {
+                  userId: userinfo.id,
+                };
+
+                //email en wachtwoord zijn correct dus we geven het token terug.
+                jwt.sign(payload, jwtSecretKey, { expiresIn: '24d' }, function (err, token) {
+                  logger.info('User succesfully logged in: ' + token);
+                  res.status(200).json({
+                    status: 200,
+                    message: 'Succesfully logged in',
+                    result: { ...userinfo, token },
+                  });
+                });
+                //email en wachtwoord zijn incorrect dus we geven een error terug.
+              } else {
+                logger.debug('Email or password is incorrect or does not exist.');
+                res.status(400).json({
+                  status: 400,
+                  message: 'Email or password is incorrect or does not exist.',
+                  data: {
+                    error: 'Email or password is incorrect or does not exist.',
+                  },
+                });
+              }
+            });
+          } else {
+            logger.debug('No user found');
+          }
+        });
+
+        //dbconnection is not connected
+      } else {
+        logger.info('No connection with database.');
+      }
+    });
   },
 
   //Ckeck of de inloggegevens correct zijn.
   validateLogin(req, res, next) {
     logger.info('ValidateLogin called');
+
+    logger.info(req.body.emailAdress);
+    logger.info(req.body.password);
 
     try {
       assert(typeof req.body.emailAdress === 'string', 'string email must be a string.');
