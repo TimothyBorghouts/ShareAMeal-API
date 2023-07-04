@@ -270,6 +270,7 @@ let controller = {
         res.status(200).json({
           status: 200,
           message: 'Maaltijd met ID ' + mealId + ' is verwijderd',
+          data: '',
         });
       });
     });

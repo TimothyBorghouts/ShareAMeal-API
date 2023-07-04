@@ -385,7 +385,7 @@ describe('Testing Meal', () => {
           res.should.be.an('object');
           let { status, message } = res.body;
           status.should.equals(200);
-          message.should.be.a('string').that.equals('Maaltijd is uit de database verwijderd');
+          message.should.be.a('string').that.equals('Maaltijd met ID 2 is verwijderd');
           done();
         });
     });
