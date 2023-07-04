@@ -76,6 +76,7 @@ let controller = {
       const error = {
         status: 400,
         message: err.message,
+        data: '',
       };
       next(error);
     }
@@ -131,7 +132,8 @@ let controller = {
             logger.debug('Added meal to database.');
             res.status(201).json({
               status: 201,
-              result: meal,
+              message: 'Meal succesfully added',
+              data: meal,
             });
           });
         }

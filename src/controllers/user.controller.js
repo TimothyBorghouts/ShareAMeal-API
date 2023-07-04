@@ -22,6 +22,7 @@ let controller = {
           res.status(404).json({
             status: 404,
             message: 'User with Id: ' + userId + ' does not exist',
+            data: '',
           });
         } else {
           next();
@@ -42,6 +43,7 @@ let controller = {
       res.status(403).json({
         status: 403,
         message: 'Unauthorized: You are not the owner of the data',
+        data: '',
       });
     }
   },
@@ -94,6 +96,7 @@ let controller = {
       const error = {
         status: 400,
         message: err.message,
+        data: '',
       };
       next(error);
     }
@@ -188,7 +191,8 @@ let controller = {
           logger.debug('Found all the users with getAllUsers.');
           res.status(200).json({
             status: 200,
-            result: results,
+            message: 'found users',
+            data: results,
           });
         }
       });
@@ -218,7 +222,8 @@ let controller = {
           let user = result;
           res.status(200).json({
             status: 200,
-            result: result,
+            message: 'User profile found',
+            data: result,
           });
         }
       });
@@ -240,7 +245,8 @@ let controller = {
           logger.debug('Found specific user with getUserById.');
           res.status(200).json({
             status: 200,
-            result: results[0],
+            message: 'Found user with id: ' + userId,
+            data: results[0],
           });
         }
       });
@@ -268,7 +274,8 @@ let controller = {
             logger.debug('Updated user with updateUserById.');
             res.status(200).json({
               status: 200,
-              result: user,
+              message: 'User succesfully updated',
+              data: user,
             });
           }
         );

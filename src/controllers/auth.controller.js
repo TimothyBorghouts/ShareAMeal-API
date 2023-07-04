@@ -124,6 +124,7 @@ let controller = {
       res.status(401).json({
         status: 401,
         message: 'No authorization header',
+        data: '',
       });
     } else {
       const token = authHeader.substring(7, authHeader.length);
