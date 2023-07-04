@@ -20,6 +20,7 @@ let controller = {
           res.status(404).json({
             status: 404,
             message: 'Meal with Id: ' + mealId + ' does not exist',
+            data: '',
           });
         } else {
           next();
@@ -96,6 +97,7 @@ let controller = {
           res.status(200).json({
             status: 200,
             message: 'succesvol aangemeld',
+            data: results,
           });
         }
       });
@@ -114,7 +116,8 @@ let controller = {
         connection.release();
         res.status(200).json({
           status: 200,
-          result: 'succesvol afgemeld',
+          message: 'succesvol afgemeld',
+          data: '',
         });
       });
     });

@@ -17,10 +17,10 @@ router.post('/api/meal', authController.validateToken, mealController.validateMe
 // );
 
 //UC-303 - Opvragen van alle maaltijden
-router.get('/api/meal', authController.validateToken, mealController.getAllMeals);
+router.get('/api/meal', mealController.getAllMeals);
 
 //UC-304 - Opvragen van maaltijd bij ID
-router.get('/api/meal/:mealId', authController.validateToken, mealController.validateMealExistence, mealController.getMealById);
+router.get('/api/meal/:mealId', mealController.validateMealExistence, mealController.getMealById);
 
 // //UC-305 - Verwijderen van maaltijd
 // router.delete('/api/meal/:mealId', authController.validateToken, mealController.validateMealExistence, mealController.validateMealOwnership, mealController.deleteMealById);

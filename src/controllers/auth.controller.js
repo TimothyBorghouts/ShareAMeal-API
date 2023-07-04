@@ -136,6 +136,7 @@ let controller = {
           res.status(401).json({
             status: 401,
             message: 'Not authorized',
+            data: '',
           });
         }
         if (payload) {
