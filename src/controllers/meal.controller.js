@@ -4,7 +4,57 @@ const { log } = require('console');
 const logger = require('../config/config').logger;
 
 let controller = {
-  validateMeal: (req, res, next) => {
+  validateMealExistence: (req, res, next) => {
+    logger.info('validateMealExistence called');
+
+    const mealId = req.params.mealId;
+
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query('SELECT * FROM meal WHERE id = ' + mealId, function (error, results, fields) {
+        if (error) throw error;
+
+        if (results.length <= 0) {
+          logger.debug('Meal was not found with id ' + mealId + '.');
+          connection.release();
+          res.status(404).json({
+            status: 404,
+            message: 'Meal with Id: ' + mealId + ' does not exist',
+          });
+        } else {
+          next();
+        }
+      });
+    });
+  },
+
+  validateMealOwnership: (req, res, next) => {
+    logger.info('validateMealOwnership called');
+
+    let payloadUserId = req.userId;
+    log(payloadUserId);
+    const mealId = req.params.mealId;
+    log(mealId);
+
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query('SELECT * FROM meal WHERE id = ?;', [mealId], function (error, results, fields) {
+        if (error) throw error;
+        log(results[0].cookId);
+        connection.release();
+        if (results[0].cookId == payloadUserId) {
+          next();
+        } else {
+          res.status(403).json({
+            status: 403,
+            message: 'Unauthorized: You are not the owner of the data',
+          });
+        }
+      });
+    });
+  },
+
+  validateMealInput: (req, res, next) => {
     let meal = req.body;
     let { name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, maxAmountOfParticipants, price } = meal;
 
@@ -100,33 +150,20 @@ let controller = {
 
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      connection.query('SELECT * FROM meal WHERE id = ?;', [mealId], function (error, results, fields) {
-        if (error) throw error;
-
-        if (results.length > 0) {
-          connection.query(
-            `UPDATE meal SET isActive = ?, isVega = ?, isVegan = ?, isToTakeHome = ?, dateTime = ?, maxAmountOfParticipants = ?, price = ?, imageUrl = ?, name = ?, description = ? WHERE id = ${mealId}`,
-            [meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, meal.price, meal.imageUrl, meal.name, meal.description],
-            function (error, results, fields) {
-              connection.release();
-              if (error) throw error;
-
-              logger.debug('Updated meal with updateMealById.');
-              res.status(200).json({
-                status: 200,
-                result: meal,
-              });
-            }
-          );
-        } else {
+      connection.query(
+        `UPDATE meal SET isActive = ?, isVega = ?, isVegan = ?, isToTakeHome = ?, dateTime = ?, maxAmountOfParticipants = ?, price = ?, imageUrl = ?, name = ?, description = ? WHERE id = ${mealId}`,
+        [meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, meal.price, meal.imageUrl, meal.name, meal.description],
+        function (error, results, fields) {
           connection.release();
-          logger.debug('Meal was not found with updateMealById.');
-          return res.status(404).json({
-            status: 404,
-            message: 'Maaltijd met Id bestaat niet',
+          if (error) throw error;
+
+          logger.debug('Updated meal with updateMealById.');
+          res.status(200).json({
+            status: 200,
+            result: meal,
           });
         }
-      });
+      );
     });
   },
 
@@ -199,28 +236,15 @@ let controller = {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
 
-      connection.query('SELECT * FROM meal Where id = ?;', [mealId], function (error, results, fields) {
+      connection.query('DELETE FROM meal Where id = ?', [mealId], function (error, results, fields) {
+        connection.release();
         if (error) throw error;
 
-        if (results.length == 0) {
-          logger.debug('Meal was not found with deleteMealById.');
-          connection.release();
-          res.status(404).json({
-            status: 404,
-            message: 'Maaltijd met Id ' + mealId + ' bestaat niet',
-          });
-        } else {
-          connection.query('DELETE FROM meal Where id = ?', [mealId], function (error, results, fields) {
-            connection.release();
-            if (error) throw error;
-
-            logger.debug('Deleted meal with deleteMealById.');
-            res.status(200).json({
-              status: 200,
-              message: 'Maaltijd is uit de database verwijderd',
-            });
-          });
-        }
+        logger.debug('Deleted meal with deleteMealById.');
+        res.status(200).json({
+          status: 200,
+          message: 'Maaltijd is uit de database verwijderd',
+        });
       });
     });
   },

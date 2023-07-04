@@ -4,24 +4,25 @@ const { log } = require('console');
 const logger = require('../config/config').logger;
 
 let controller = {
-  checkIfMealExists: (req, res, next) => {
-    logger.info('checkIfMealExists called');
-    const mealId = parseInt(req.params.mealId);
+  validateMealExistence: (req, res, next) => {
+    logger.info('validateMealExistence called');
 
-    dbconnection.getConnection((err, connection) => {
-      if (err) {
-        throw err;
-      }
-      connection.query('SELECT * FROM meal WHERE id = ?;', [mealId], (err, results, fields) => {
-        connection.release();
-        if (results.length !== 0) {
-          next();
-        } else {
-          const err = {
+    const mealId = req.params.mealId;
+
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query('SELECT * FROM meal WHERE id = ' + mealId, function (error, results, fields) {
+        if (error) throw error;
+
+        if (results.length <= 0) {
+          logger.debug('Meal was not found with id ' + mealId + '.');
+          connection.release();
+          res.status(404).json({
             status: 404,
-            message: 'Maaltijd met ID ' + mealId + ' bestaat niet',
-          };
-          next(err);
+            message: 'Meal with Id: ' + mealId + ' does not exist',
+          });
+        } else {
+          next();
         }
       });
     });
@@ -43,6 +44,32 @@ let controller = {
             message: `Aanmelding bestaat niet`,
           };
           next(err);
+        }
+      });
+    });
+  },
+
+  validateMealOwnership: (req, res, next) => {
+    logger.info('validateUserOwnership called');
+
+    let payloadUserId = req.userId;
+    log(payloadUserId);
+    const mealId = req.params.mealId;
+    log(mealId);
+
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query('SELECT * FROM meal WHERE id = ?;', [mealId], function (error, results, fields) {
+        if (error) throw error;
+        log(results[0].cookId);
+        connection.release();
+        if (results[0].cookId == payloadUserId) {
+          next();
+        } else {
+          res.status(403).json({
+            status: 403,
+            message: 'Unauthorized: You are not the owner of the data',
+          });
         }
       });
     });

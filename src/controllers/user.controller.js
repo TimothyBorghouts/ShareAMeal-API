@@ -3,9 +3,50 @@ const assert = require('assert');
 const logger = require('../config/config').logger;
 const jwtSecretKey = require('../config/config').jwtSecretKey;
 const bcrypt = require('bcrypt');
+const { log } = require('console');
 
 let controller = {
-  validateUser: (req, res, next) => {
+  validateUserExistence: (req, res, next) => {
+    logger.info('validateUserExistence called');
+
+    const userId = req.params.userId;
+
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query('SELECT * FROM user WHERE id = ' + userId, function (error, results, fields) {
+        if (error) throw error;
+
+        if (results.length <= 0) {
+          logger.debug('User was not found with id ' + userId + '.');
+          connection.release();
+          res.status(404).json({
+            status: 404,
+            message: 'User with Id: ' + userId + ' does not exist',
+          });
+        } else {
+          next();
+        }
+      });
+    });
+  },
+
+  validateUserOwnership: (req, res, next) => {
+    logger.info('validateUserOwnership called');
+
+    let payloadUserId = req.userId;
+    let userIdToChange = req.params.userId;
+
+    if (userIdToChange == payloadUserId) {
+      next();
+    } else {
+      res.status(403).json({
+        status: 403,
+        message: 'Unauthorized: You are not the owner of the data',
+      });
+    }
+  },
+
+  validateUserInput: (req, res, next) => {
     logger.info('validateUser called');
 
     let user = req.body;
@@ -192,13 +233,7 @@ let controller = {
         connection.release();
         if (error) throw error;
 
-        if (results.length == 0) {
-          logger.debug('No user found with getUserById.');
-          res.status(404).json({
-            status: 404,
-            message: 'User with Id: ' + userId + ' does not exist',
-          });
-        } else {
+        if (results.length > 0) {
           logger.debug('Found specific user with getUserById.');
           res.status(200).json({
             status: 200,
@@ -219,33 +254,21 @@ let controller = {
     bcrypt.hash(user.password, 10, function (err, hash) {
       dbconnection.getConnection(function (err, connection) {
         if (err) throw err;
-        connection.query('SELECT * FROM user WHERE id = ' + userId, function (error, results, fields) {
-          if (error) throw error;
 
-          if (results.length > 0) {
-            connection.query(
-              `UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, street = ?, city = ? WHERE id = ${userId}`,
-              [firstName, lastName, emailAdress, hash, street, city],
-              function (error, results, fields) {
-                connection.release();
-                if (error) throw error;
-
-                logger.debug('Updated user with updateUserById.');
-                res.status(200).json({
-                  status: 200,
-                  result: user,
-                });
-              }
-            );
-          } else {
-            logger.debug('User was not found with updateUserById.');
+        connection.query(
+          `UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, street = ?, city = ? WHERE id = ${userId}`,
+          [firstName, lastName, emailAdress, hash, street, city],
+          function (error, results, fields) {
             connection.release();
-            res.status(404).json({
-              status: 404,
-              message: 'User with Id: ' + userId + ' does not exist',
+            if (error) throw error;
+
+            logger.debug('Updated user with updateUserById.');
+            res.status(200).json({
+              status: 200,
+              result: user,
             });
           }
-        });
+        );
       });
     });
   },
@@ -257,28 +280,16 @@ let controller = {
     const userId = req.params.userId;
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
-      connection.query('SELECT * FROM user WHERE id = ' + userId, function (error, results, fields) {
+
+      connection.query('DELETE FROM user WHERE id = ' + userId, function (error, results, fields) {
+        connection.release();
         if (error) throw error;
 
-        if (results.length > 0) {
-          connection.query('DELETE FROM user WHERE id = ' + userId, function (error, results, fields) {
-            connection.release();
-            if (error) throw error;
-
-            logger.debug('Deleted user with deleteUserById.');
-            res.status(200).json({
-              status: 200,
-              message: 'User is deleted.',
-            });
-          });
-        } else {
-          logger.debug('User was not found with deleteUserById.');
-          connection.release();
-          res.status(400).json({
-            status: 400,
-            message: 'User does not exist',
-          });
-        }
+        logger.debug('Deleted user with deleteUserById.');
+        res.status(200).json({
+          status: 200,
+          message: 'User is deleted.',
+        });
       });
     });
   },
