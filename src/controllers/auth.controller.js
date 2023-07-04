@@ -85,6 +85,10 @@ let controller = {
             });
           } else {
             logger.debug('No user found');
+            res.status(404).json({
+              status: 404,
+              message: 'This user does not exist in the database',
+            });
           }
         });
 
