@@ -61,7 +61,7 @@ let controller = {
       assert(typeof city === 'string', 'City must be a string.');
 
       //Regex die checkt of het emailaddress twee punten en een apenstaartje bevatten.
-      assert.match(emailAdress, /.+\@.+\..+/, 'The email address is incorrect.');
+      assert.match(emailAdress, /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, 'The email address is incorrect.');
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(password, /([0-9a-zA-Z]{8,})/, 'The password is to short.');
 
@@ -70,7 +70,7 @@ let controller = {
       logger.debug('Wrong user input');
       const error = {
         status: 400,
-        message: err.message,
+        data: err.message,
       };
       next(error);
     }
