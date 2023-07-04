@@ -122,6 +122,7 @@ let controller = {
               res.status(403).json({
                 status: 403,
                 message: 'User with email: ' + user.emailAdress + ' does already exist.',
+                data: '',
               });
             } else {
               connection.query(`SELECT * FROM user WHERE emailAdress = '${user.emailAdress}'`, function (error, results, fields) {
@@ -139,7 +140,8 @@ let controller = {
                 logger.debug('Added user to database with addUser.');
                 res.status(201).json({
                   status: 201,
-                  result: user,
+                  message: 'Succesfully created user',
+                  data: user,
                 });
               });
             }
