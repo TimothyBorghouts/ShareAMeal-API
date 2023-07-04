@@ -77,9 +77,7 @@ let controller = {
                 res.status(400).json({
                   status: 400,
                   message: 'Email or password is incorrect or does not exist.',
-                  data: {
-                    error: 'Email or password is incorrect or does not exist.',
-                  },
+                  data: '',
                 });
               }
             });
@@ -118,9 +116,7 @@ let controller = {
       res.status(400).json({
         status: 400,
         message: err.toString(),
-        data: {
-          error: 'emailAdress or password was incorrect',
-        },
+        data: '',
       });
     }
   },
