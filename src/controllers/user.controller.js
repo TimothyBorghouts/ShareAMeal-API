@@ -63,7 +63,7 @@ let controller = {
       assert(typeof city === 'string', 'City must be a string.');
 
       //Regex die checkt of het emailaddress twee punten en een apenstaartje bevatten.
-      assert.match(emailAdress, /^(?=.{1,64}@)[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/, 'The email address is incorrect.');
+      assert.match(emailAdress, /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.(nl|com)$/, 'The email address is incorrect.');
       //Regex die checkt of het wachtwoord 8 letters of getallen bevat.
       assert.match(password, /([0-9a-zA-Z]{8,})/, 'The password is too short.');
 
