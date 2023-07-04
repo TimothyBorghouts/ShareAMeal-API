@@ -26,7 +26,7 @@ let controller = {
 
           connection.query('SELECT * FROM `user` WHERE `emailAdress` = ?', [req.body.emailAdress], (err, rows, fields) => {
             //User with that emailAdress does not exist.
-            log("hello");
+            logger.info('hello1');
             if (err) {
               connection.release();
               logger.debug('User does not exist');
@@ -39,10 +39,13 @@ let controller = {
               });
             }
 
+            logger.info('hello2');
             //Kijken of het wachtwoord bestaat en of er wel een wachtwoord is ingevoerd.
             if (rows && rows.length == 1) {
+              logger.info('hello3');
               //Kijken of de het wachtwoord klopt met bcrypt
               bcrypt.compare(req.body.password, rows[0].password, function (err, result) {
+                logger.info('hello4');
                 if (result == true) {
                   logger.info('password is correct.');
 
