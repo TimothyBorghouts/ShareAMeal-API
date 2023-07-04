@@ -119,7 +119,7 @@ let controller = {
         res.status(200).json({
           status: 200,
           message: 'User met ID ' + userId + ' is afgemeld voor maaltijd met ID ' + mealId,
-          data: '',
+          data: 'Afgemeld',
         });
       });
     });

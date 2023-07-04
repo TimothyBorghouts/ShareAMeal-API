@@ -76,8 +76,8 @@ let controller = {
             });
           } else {
             logger.debug('No user found');
-            res.status(404).json({
-              status: 404,
+            res.status(400).json({
+              status: 400,
               message: 'This user does not exist in the database',
               data: '',
             });
