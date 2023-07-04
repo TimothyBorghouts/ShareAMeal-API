@@ -117,10 +117,10 @@ let controller = {
           function (err, results, fields) {
             if (err) {
               connection.release();
-              logger.debug('Could not add user to database, email alreadt exists.');
+              logger.debug('Could not add user to database, email already exists.');
 
-              res.status(409).json({
-                status: 409,
+              res.status(403).json({
+                status: 403,
                 message: 'User with email: ' + user.emailAdress + ' does already exist.',
               });
             } else {
