@@ -70,8 +70,8 @@ let controller = {
       logger.debug('Wrong user input');
       const error = {
         status: 400,
-        message: 'Wrong user input, fields are incorrect',
-        data: err.message,
+        message: err.message,
+        data: '',
       };
       next(error);
     }
