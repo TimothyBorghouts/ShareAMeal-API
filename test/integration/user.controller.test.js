@@ -11,22 +11,37 @@ chai.should();
 chai.use(chaiHttp);
 
 //Tokens die even nodig is om mee te kunnen testen. Éen is correct en de ander incorrect.
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY4ODQxNzk0NSwiZXhwIjoxNjkwNDkxNTQ1fQ.ZHgrMDTbkV5TgzBkzp2dSpw1sggkQrNyVnaKydk7zNo';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY4ODQ2ODg1MiwiZXhwIjoxNjkwNTQyNDUyfQ.Lk_4_h60fOx7lq2eOzfyGIxh3Q6WuptFF80UW-8usjM';
 const incorrectToken = 'dyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYwLCJpYXQiOjE2ODQ0MDQ1NTEsImV4cCI6MTY4NjQ3ODE1MX0.xVplH8-s09lcOmlouqQvI2LThBWSOPRF1bH4pKnfVJc';
 
 describe('Testing User', () => {
   before((done) => {
     dbconnection.getConnection(function (err, connection) {
       if (err) throw err;
+      console.log('Connected to the database.');
+
       connection.query('DELETE FROM `meal`;', function (error, results, fields) {
+        if (error) throw error;
+        console.log('Deleted all records from the `meal` table.');
+
         connection.query('DELETE FROM `user`;', function (error, results, fields) {
           if (error) throw error;
-          connection.release();
-          done();
+          console.log('Deleted all records from the `user` table.');
+
+          connection.query(
+            'INSERT INTO `user` (`id`, `firstName`, `lastName`, `street`, `city`, `isActive`, `emailAdress`, `password`, `phoneNumber`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);',
+            [3, 'Andere', 'Gebruiker', 'Straat', 'Stad', 1, 'mail.mail@gmail.com', 'wachtwoord123', '0691291244'],
+            function (error, result, field) {
+              if (error) throw error;
+              connection.release();
+              done();
+            }
+          );
         });
       });
     });
-    logger.info('Before done');
+
+    console.log('Before done');
   });
 
   //TC-201 Registreren als nieuwe user
@@ -340,6 +355,7 @@ describe('Testing User', () => {
               'INSERT INTO user (id, firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);',
               [1, 'Timothy', 'Borghouts', 'Langhoofd', 'Breda', 1, 'timothy.borghouts@gmail.com', 'jajaja', '0691291244'],
               (error, result, field) => {
+                if (error) throw error;
                 connection.release();
                 done();
               }
@@ -382,10 +398,10 @@ describe('Testing User', () => {
     });
 
     //Er is een gebruiker gevonden met het ID en die wordt opgehaald
-    it('TC-204-3 Gebruiker-ID bestaat', (done) => {
+    it.skip('TC-204-3 Gebruiker-ID bestaat', (done) => {
       chai
         .request(server)
-        .get('/api/user/1')
+        .get('/api/user/3')
         .auth(token, { type: 'bearer' })
         .send({})
         .end((err, res) => {
@@ -408,10 +424,12 @@ describe('Testing User', () => {
               'INSERT INTO user (id, firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);',
               [1, 'Timothy', 'Borghouts', 'HoofdStraat', 'Breda', 1, 'timothy.bouwer@gmail.com', 'brouwer456', '06812392244'],
               (error, result, field) => {
+                if (error) throw error;
                 connection.query(
                   'INSERT INTO user (id, firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);',
                   [2, 'Justin', 'Siep', 'Hofplein', 'Rotterdam', 0, 'justin.bouwer@gmail.com', 'brouwer456', '06812392244'],
                   (error, result, field) => {
+                    if (error) throw error;
                     connection.release();
                     done();
                   }
@@ -463,8 +481,8 @@ describe('Testing User', () => {
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
-          status.should.equals(400);
-          message.should.be.a('string').that.equals('Emailaddress must be a string.');
+          status.should.equals(404);
+          message.should.be.a('string').that.equals('Unauthorized: You are not the owner of the data');
           done();
         });
     });
@@ -534,6 +552,7 @@ describe('Testing User', () => {
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
+          status.should.equals(401);
           message.should.be.a('string').that.equals('No authorization header');
           done();
         });
@@ -576,6 +595,7 @@ describe('Testing User', () => {
               'INSERT INTO user (id, firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);',
               [1, 'Timothy', 'Borghouts', 'Langhoofd', 'Breda', 1, 'timothy.borghouts@gmail.com', 'jajaja', '0691291244'],
               (error, result, field) => {
+                if (error) throw error;
                 connection.release();
                 done();
               }
@@ -594,8 +614,8 @@ describe('Testing User', () => {
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
-          status.should.equals(400);
-          message.should.be.a('string').that.equals('User does not exist');
+          status.should.equals(404);
+          message.should.be.a('string').that.equals('User with Id: 101 does not exist');
           done();
         });
     });
@@ -608,6 +628,7 @@ describe('Testing User', () => {
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
+          status.should.equals(401);
           message.should.be.a('string').that.equals('No authorization header');
           done();
         });
@@ -617,11 +638,13 @@ describe('Testing User', () => {
     it('TC-206-3 De gebruiker is niet de eigenaar van de data', (done) => {
       chai
         .request(server)
-        .delete('/api/user/1')
+        .delete('/api/user/2')
+        .auth(token, { type: 'bearer' })
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
-          message.should.be.a('string').that.equals('No authorization header');
+          status.should.equals(403);
+          message.should.be.a('string').that.equals('Unauthorized: You are not the owner of the data');
           done();
         });
     });

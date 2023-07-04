@@ -7,7 +7,14 @@ const mealController = require('../controllers/meal.controller');
 router.post('/api/meal', authController.validateToken, mealController.validateMealInput, mealController.addMeal);
 
 //UC-302 - Wijzigen van maaltijdgegevens
-router.put('/api/meal/:mealId', authController.validateToken, mealController.validateMealExistence, mealController.validateMealOwnership, mealController.validateMealInput, mealController.updateMealById);
+router.put(
+  '/api/meal/:mealId',
+  authController.validateToken,
+  mealController.validateMealExistence,
+  mealController.validateMealInput,
+  mealController.validateMealOwnership,
+  mealController.updateMealById
+);
 
 //UC-303 - Opvragen van alle maaltijden
 router.get('/api/meal', authController.validateToken, mealController.getAllMeals);

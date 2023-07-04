@@ -9,7 +9,7 @@ const logger = require('../../src/config/config').logger;
 chai.should();
 chai.use(chaiHttp);
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY4ODQxNzk0NSwiZXhwIjoxNjkwNDkxNTQ1fQ.ZHgrMDTbkV5TgzBkzp2dSpw1sggkQrNyVnaKydk7zNo';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY4ODQ2ODM3MSwiZXhwIjoxNjkwNTQxOTcxfQ.1zjM2JtvxS4i_ZARgZyrBsPeOIz83BZ_vRWLNvdY8dw';
 
 describe('Testing Participate', () => {
   before((done) => {
@@ -47,7 +47,7 @@ describe('Testing Participate', () => {
   });
 
   //TC-401 Aanmelden voor maaltijd
-  describe('TC-401 Toevoegen van maaltijd', () => {
+  describe('TC-401 Aanmelden voor maaltijd', () => {
     it('TC-401-1 Niet ingelogd', (done) => {
       chai
         .request(server)
@@ -66,7 +66,7 @@ describe('Testing Participate', () => {
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
           res.body.status.should.be.equal(404);
-          res.body.message.should.be.equal('Maaltijd met ID 100 bestaat niet');
+          res.body.message.should.be.equal('Meal with Id: 100 does not exist');
           done();
         });
     });
@@ -124,7 +124,7 @@ describe('Testing Participate', () => {
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
           res.body.status.should.be.equal(404);
-          res.body.message.should.be.equal('Maaltijd met ID 100 bestaat niet');
+          res.body.message.should.be.equal('Meal with Id: 100 does not exist');
           done();
         });
     });

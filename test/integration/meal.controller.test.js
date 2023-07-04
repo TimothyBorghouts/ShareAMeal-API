@@ -7,12 +7,11 @@ const assert = require('assert');
 const dbconnection = require('../../database/dbconnection');
 const logger = require('../../src/config/config').logger;
 
-
 chai.should();
 chai.use(chaiHttp);
 
 //Tokens die even nodig is om mee te kunnen testen. Éen is correct en de ander incorrect.
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY4ODQxNzk0NSwiZXhwIjoxNjkwNDkxNTQ1fQ.ZHgrMDTbkV5TgzBkzp2dSpw1sggkQrNyVnaKydk7zNo';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY4ODQ2ODg1MiwiZXhwIjoxNjkwNTQyNDUyfQ.Lk_4_h60fOx7lq2eOzfyGIxh3Q6WuptFF80UW-8usjM';
 
 describe('Testing Meal', () => {
   before((done) => {
@@ -22,15 +21,33 @@ describe('Testing Meal', () => {
         connection.query('DELETE FROM user;', function (error, result, field) {
           connection.query(
             'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-              '(5, "Timothy", "Borghouts", "timothy.borghouts@gmail.com", "wachtwoord123", "Brugstraat", "Eindhoven");',
+              '(1, "Timothy", "Borghouts", "timothy.borghouts@gmail.com", "wachtwoord123", "Brugstraat", "Eindhoven");',
             function (error, result, field) {
               connection.query(
-                'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
-                  "(1, 'Vegetarische plopkoek', 'plopkoeken zijn gewoon lekker', 'Geen afbeelding', '2022-04-09 09:37:10', 10, 20.00, 5);",
+                'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
+                  '(2, "John", "Doe", "john.doe@gmail.com", "password456", "Main Street", "New York");',
                 function (error, result, field) {
-                  if (error) throw error;
-                  connection.release();
-                  done();
+                  connection.query(
+                    'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
+                      "(1, 'Vegetarische plopkoek', 'plopkoeken zijn gewoon lekker', 'Geen afbeelding', '2022-04-09 09:37:10', 10, 20.00, 1);",
+                    function (error, result, field) {
+                      connection.query(
+                        'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
+                          "(2, 'Vegetarische pannenkoek', 'pannenkoek met melk, kaas en spek', 'geen afbeelding', '2022-04-10 18:30:00', 8, 15.00, 1);",
+                        function (error, result, field) {
+                          connection.query(
+                            'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
+                              "(3, 'Gegrilde groenten', 'gezonde groenten van het seizoen', 'geen afbeelding', '2022-05-15 19:00:00', 12, 18.00, 2);",
+                            function (error, result, field) {
+                              if (error) throw error;
+                              connection.release();
+                              done();
+                            }
+                          );
+                        }
+                      );
+                    }
+                  );
                 }
               );
             }
@@ -60,7 +77,6 @@ describe('Testing Meal', () => {
           price: 12.0,
           imageUrl: 'https://www.kikkoman.nl/fileadmin/_processed_/5/7/csm_WEB_Bonte_groenteschotel_6851203953.jpg',
           allergenes: ['noten'],
-          cookId: 5,
         })
         .end((err, res) => {
           res.should.be.an('object');
@@ -183,10 +199,11 @@ describe('Testing Meal', () => {
     it('TC-302-3 Niet de eigenaar van de data', (done) => {
       chai
         .request(server)
-        .put('/api/meal/1')
+        .put('/api/meal/3')
         .auth(token, { type: 'bearer' })
         .send({
           name: 'Vegetarische pizza',
+          description: 'De beste vegetarische pizza van de wereld',
           isActive: 1,
           isVega: 0,
           isVegan: 1,
@@ -200,8 +217,8 @@ describe('Testing Meal', () => {
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
-          status.should.equals(400);
-          message.should.be.a('string').that.equals('Description must be a string');
+          status.should.equals(403);
+          message.should.be.a('string').that.equals('Unauthorized: You are not the owner of the data');
           done();
         });
     });
@@ -229,7 +246,7 @@ describe('Testing Meal', () => {
           res.should.be.an('object');
           let { status, message } = res.body;
           status.should.equals(404);
-          message.should.be.a('string').that.equals('Maaltijd met Id bestaat niet');
+          message.should.be.a('string').that.equals('Meal with Id: 300 does not exist');
           done();
         });
     });
@@ -238,7 +255,7 @@ describe('Testing Meal', () => {
     it('TC-302-5 Maaltijd succesvol gewijzigd', (done) => {
       chai
         .request(server)
-        .put('/api/meal/1')
+        .put('/api/meal/2')
         .auth(token, { type: 'bearer' })
         .send({
           name: 'Vegetarische pizza',
@@ -293,7 +310,7 @@ describe('Testing Meal', () => {
           res.should.be.an('object');
           let { status, message } = res.body;
           status.should.equals(404);
-          message.should.be.a('string').that.equals('Maaltijd met Id 100 bestaat niet');
+          message.should.be.a('string').that.equals('Meal with Id: 100 does not exist');
           done();
         });
     });
@@ -319,7 +336,7 @@ describe('Testing Meal', () => {
     it('TC-305-1 Niet ingelogd', (done) => {
       chai
         .request(server)
-        .delete('/api/meal/1')
+        .delete('/api/meal/2')
         .end((err, res) => {
           res.should.be.an('object');
           let { status, message } = res.body;
@@ -352,7 +369,7 @@ describe('Testing Meal', () => {
           res.should.be.an('object');
           let { status, message } = res.body;
           status.should.equals(404);
-          message.should.be.a('string').that.equals('Maaltijd met Id 200 bestaat niet');
+          message.should.be.a('string').that.equals('Meal with Id: 200 does not exist');
           done();
         });
     });
@@ -361,7 +378,7 @@ describe('Testing Meal', () => {
     it('TC-305-4 Maaltijd succesvol verwijderd', (done) => {
       chai
         .request(server)
-        .delete('/api/meal/1')
+        .delete('/api/meal/2')
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
           console.log(err);

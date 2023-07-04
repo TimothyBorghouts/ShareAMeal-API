@@ -16,9 +16,17 @@ router.get('/api/user/profile', authController.validateToken, userController.get
 router.get('/api/user/:userId', authController.validateToken, userController.validateUserExistence, userController.getUserById);
 
 //UC-205 - Wijzigen van usergegevens
-router.put('/api/user/:userId', authController.validateToken, userController.validateUserExistence, userController.validateUserOwnership, userController.validateUserInput, userController.validatePhoneNumber, userController.updateUserById);
+router.put(
+  '/api/user/:userId',
+  authController.validateToken,
+  userController.validateUserExistence,
+  userController.validateUserOwnership,
+  userController.validateUserInput,
+  userController.validatePhoneNumber,
+  userController.updateUserById
+);
 
 //UC-206 - Verwijderen van user
-router.delete('/api/user/:userId', authController.validateToken, userController.validateUserExistence, userController.validateUserOwnership, userController.deleteUserById);
+router.delete('/api/user/:userId', authController.validateToken, userController.validateUserOwnership, userController.validateUserExistence, userController.deleteUserById);
 
 module.exports = router;
