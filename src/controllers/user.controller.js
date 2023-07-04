@@ -216,6 +216,7 @@ let controller = {
           res.status(404).json({
             statusCode: 404,
             message: `No user with ${userId} found`,
+            data: '',
           });
         } else {
           logger.info('User found with id ' + userId);

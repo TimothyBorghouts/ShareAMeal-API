@@ -20,6 +20,7 @@ let controller = {
           res.status(404).json({
             status: 404,
             message: 'Meal with Id: ' + mealId + ' does not exist',
+            data: '',
           });
         } else {
           next();
@@ -48,6 +49,7 @@ let controller = {
           res.status(403).json({
             status: 403,
             message: 'Unauthorized: You are not the owner of the data',
+            data: '',
           });
         }
       });
@@ -223,7 +225,8 @@ let controller = {
 
           res.status(200).json({
             status: 200,
-            result: results[0],
+            message: 'Succesfully received profile',
+            data: results[0],
           });
         }
       });

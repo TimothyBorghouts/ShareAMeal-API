@@ -43,6 +43,7 @@ let controller = {
           const err = {
             status: 404,
             message: `Aanmelding bestaat niet`,
+            data: '',
           };
           next(err);
         }
@@ -70,6 +71,7 @@ let controller = {
           res.status(403).json({
             status: 403,
             message: 'Unauthorized: You are not the owner of the data',
+            data: '',
           });
         }
       });
