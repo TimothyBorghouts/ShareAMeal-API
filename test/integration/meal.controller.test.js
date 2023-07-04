@@ -274,8 +274,8 @@ describe('Testing Meal', () => {
           assert.ifError(err);
           res.should.have.status(200);
           res.should.be.an('object');
-          let { result } = res.body;
-          result.should.has.property('name').to.be.equal('Vegetarische pizza');
+          let { data } = res.body;
+          data.should.has.property('name').to.be.equal('Vegetarische pizza');
           done();
         });
     });

@@ -27,7 +27,6 @@ router.put(
 );
 
 // UC-206 - Verwijderen van user
-router.delete('/api/user/:userId', authController.validateToken, userController.validateUserExistence, userController.deleteUserById);
-//VALIDATE OWNERSHIP!!!
+router.delete('/api/user/:userId', authController.validateToken, userController.validateUserExistence, userController.validateUserOwnership, userController.deleteUserById);
 
 module.exports = router;
