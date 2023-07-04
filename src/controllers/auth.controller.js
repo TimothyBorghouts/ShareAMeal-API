@@ -25,7 +25,6 @@ let controller = {
           logger.info('Succesfully connected to database');
 
           connection.query('SELECT * FROM `user` WHERE `emailAdress` = ?', [req.body.emailAdress], (err, rows, fields) => {
-            connection.release();
             //User with that emailAdress does not exist.
             if (err) {
               connection.release();
