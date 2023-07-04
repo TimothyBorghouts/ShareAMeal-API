@@ -24,6 +24,7 @@ let controller = {
         logger.info('Succesfully connected to database');
 
         connection.query('SELECT * FROM `user` WHERE `emailAdress` = ?', [req.body.emailAdress], (err, rows, fields) => {
+          connection.release();
           //User with that emailAdress does not exist.
           if (err) {
             connection.release();
@@ -31,9 +32,7 @@ let controller = {
             res.status(404).json({
               status: 404,
               message: 'User does not exist.',
-              data: {
-                error: 'User does not exist',
-              },
+              data: '',
             });
           }
 
@@ -86,6 +85,7 @@ let controller = {
             res.status(404).json({
               status: 404,
               message: 'This user does not exist in the database',
+              data: '',
             });
           }
         });
@@ -133,6 +133,7 @@ let controller = {
       });
     } else {
       const token = authHeader.substring(7, authHeader.length);
+      logger.debug(token);
 
       jwt.verify(token, jwtSecretKey, (err, payload) => {
         if (err) {
