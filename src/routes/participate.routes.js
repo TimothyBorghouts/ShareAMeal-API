@@ -20,7 +20,7 @@ router.get(
   '/api/meal/:mealId/participants',
   authController.validateToken,
   participateController.validateMealExistence,
-  participateController.validateMealOwnership,
+  // participateController.validateMealOwnership,
   participateController.checkIfParticipateExists,
   participateController.getAllParticipants
 );
@@ -30,7 +30,7 @@ router.get(
   '/api/meal/:mealId/participants/:userId',
   authController.validateToken,
   participateController.validateMealExistence,
-  participateController.validateMealOwnership,
+  // participateController.validateMealOwnership,
   participateController.checkIfParticipateExists,
   participateController.getParticipantsDetails
 );
