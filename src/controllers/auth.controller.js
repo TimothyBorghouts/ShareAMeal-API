@@ -10,7 +10,6 @@ let controller = {
   login(req, res, next) {
     logger.info('login is called');
 
-    try {
       dbconnection.getConnection((err, connection) => {
         if (err) {
           logger.error('No connection from dbconnection.');
@@ -26,7 +25,6 @@ let controller = {
 
           connection.query('SELECT * FROM `user` WHERE `emailAdress` = ?', [req.body.emailAdress], (err, rows, fields) => {
             //User with that emailAdress does not exist.
-            logger.info('hello1');
             if (err) {
               connection.release();
               logger.debug('User does not exist');
@@ -39,11 +37,12 @@ let controller = {
               });
             }
 
-            const hello = true;
+            logger.info(rows);
+            logger.info(rows[0]);
 
             logger.info('hello2');
             //Kijken of het wachtwoord bestaat en of er wel een wachtwoord is ingevoerd.
-            if (hello) {
+            if (rows.length > 0) {
               logger.info('hello3');
               //Kijken of de het wachtwoord klopt met bcrypt
               bcrypt.compare(req.body.password, rows[0].password, function (err, result) {
@@ -94,9 +93,6 @@ let controller = {
           logger.info('No connection with database.');
         }
       });
-    } catch (error) {
-      log(error);
-    }
   },
 
   //Ckeck of de inloggegevens correct zijn.
