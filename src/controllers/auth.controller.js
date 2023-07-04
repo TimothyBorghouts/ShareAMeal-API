@@ -41,7 +41,7 @@ let controller = {
 
             logger.info('hello2');
             //Kijken of het wachtwoord bestaat en of er wel een wachtwoord is ingevoerd.
-            if (rows && rows.length === 1) {
+            if (rows && rows.length != 0) {
               logger.info('hello3');
               //Kijken of de het wachtwoord klopt met bcrypt
               bcrypt.compare(req.body.password, rows[0].password, function (err, result) {
