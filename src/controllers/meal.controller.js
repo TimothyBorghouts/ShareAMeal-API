@@ -269,7 +269,7 @@ let controller = {
         logger.debug('Deleted meal with deleteMealById.');
         res.status(200).json({
           status: 200,
-          message: 'Maaltijd is uit de database verwijderd',
+          message: 'Maaltijd met ID ' + mealId + ' is verwijderd',
         });
       });
     });

@@ -221,11 +221,11 @@ let controller = {
         } else {
           logger.info('User found with id ' + userId);
           let user = result;
-          let street = result.street;
           res.status(200).json({
             status: 200,
             message: 'User profile found',
-            data: street + user,
+            data: user,
+            street: result.street,
           });
         }
       });
@@ -300,7 +300,8 @@ let controller = {
         logger.debug('Deleted user with deleteUserById.');
         res.status(200).json({
           status: 200,
-          message: 'User is deleted.',
+          message: 'Gebruiker met ID ' + userId + ' is verwijderd',
+          data: '',
         });
       });
     });
