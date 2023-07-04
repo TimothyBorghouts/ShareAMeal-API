@@ -36,16 +36,10 @@ let controller = {
             });
           }
 
-          logger.info(rows);
-          logger.info(rows[0]);
-
-          logger.info('hello2');
           //Kijken of het wachtwoord bestaat en of er wel een wachtwoord is ingevoerd.
           if (rows.length > 0) {
-            logger.info('hello3');
             //Kijken of de het wachtwoord klopt met bcrypt
             bcrypt.compare(req.body.password, rows[0].password, function (err, result) {
-              logger.info('hello4');
               if (result == true) {
                 logger.info('password is correct.');
 
@@ -67,7 +61,7 @@ let controller = {
                   res.status(200).json({
                     status: 200,
                     message: 'Succesfully logged in',
-                    result: { ...userinfo, token },
+                    data: { ...userinfo, token },
                   });
                 });
                 //email en wachtwoord zijn incorrect dus we geven een error terug.
