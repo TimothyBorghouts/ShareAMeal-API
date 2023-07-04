@@ -142,33 +142,33 @@ let controller = {
   },
 
   //UC-302 - Wijzigen van maaltijdgegevens
-  // updateMealById: (req, res) => {
-  //   logger.info('updateMealById called');
+  updateMealById: (req, res) => {
+    logger.info('updateMealById called');
 
-  //   const mealId = req.params.mealId;
-  //   logger.debug(mealId);
-  //   let meal = req.body;
-  //   logger.debug(meal);
+    const mealId = req.params.mealId;
+    logger.debug(mealId);
+    let meal = req.body;
+    logger.debug(meal);
 
-  //   dbconnection.getConnection(function (err, connection) {
-  //     if (err) throw err;
-  //     connection.query(
-  //       `UPDATE meal SET isActive = ?, isVega = ?, isVegan = ?, isToTakeHome = ?, dateTime = ?, maxAmountOfParticipants = ?, price = ?, imageUrl = ?, name = ?, description = ? WHERE id = ${mealId}`,
-  //       [meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, meal.price, meal.imageUrl, meal.name, meal.description],
-  //       function (error, results, fields) {
-  //         connection.release();
-  //         if (error) throw error;
+    dbconnection.getConnection(function (err, connection) {
+      if (err) throw err;
+      connection.query(
+        `UPDATE meal SET isActive = ?, isVega = ?, isVegan = ?, isToTakeHome = ?, dateTime = ?, maxAmountOfParticipants = ?, price = ?, imageUrl = ?, name = ?, description = ? WHERE id = ${mealId}`,
+        [meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, meal.price, meal.imageUrl, meal.name, meal.description],
+        function (error, results, fields) {
+          connection.release();
+          if (error) throw error;
 
-  //         logger.debug('Updated meal with updateMealById.');
-  //         res.status(200).json({
-  //           status: 200,
-  //           message: 'Meal succesfully updated',
-  //           data: meal,
-  //         });
-  //       }
-  //     );
-  //   });
-  // },
+          logger.debug('Updated meal with updateMealById.');
+          res.status(200).json({
+            status: 200,
+            message: 'Meal succesfully updated',
+            data: meal,
+          });
+        }
+      );
+    });
+  },
 
   //UC-303 - Opvragen van alle maaltijden
   getAllMeals: (req, res) => {
