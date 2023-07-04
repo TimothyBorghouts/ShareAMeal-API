@@ -118,7 +118,7 @@ let controller = {
         connection.release();
         res.status(200).json({
           status: 200,
-          message: 'succesvol afgemeld',
+          message: 'User met ID ' + userId + ' is afgemeld voor maaltijd met ID ' + mealId,
           data: '',
         });
       });

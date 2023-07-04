@@ -186,7 +186,8 @@ let controller = {
         logger.debug('Found all the meals with getAllMeals.');
         res.status(200).json({
           status: 200,
-          results: results,
+          message: 'Received all meals',
+          data: results,
         });
       });
     });
@@ -217,10 +218,29 @@ let controller = {
           meal = results[0];
 
           price = parseFloat(meal.price);
+
           if (meal.isActive == 1) {
             meal.isActive = true;
           } else {
             meal.isActive = false;
+          }
+
+          if (meal.isVega == 1) {
+            meal.isVega = true;
+          } else {
+            meal.isVega = false;
+          }
+
+          if (meal.isVegan == 1) {
+            meal.isVegan = true;
+          } else {
+            meal.isVegan = false;
+          }
+
+          if (meal.isToTakeHome == 1) {
+            meal.isToTakeHome = true;
+          } else {
+            meal.isToTakeHome = false;
           }
 
           res.status(200).json({
